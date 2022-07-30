@@ -1,0 +1,51 @@
+name: Unit tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+
+
+env:
+  BUILD_TYPE: Debug
+  CXX: g++-12
+  CC: gcc-12
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          sudo apt update
+          sudo apt install gcc-12 g++-12
+          sudo apt install -y gcovr
+          sudo apt install lcov
+
+      - name: Show version
+        run: cmake --version
+
+      - name: Setup CMake
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+      - name: Test
+        working-directory: ${{github.workspace}}/build
+        run: ctest -C ${{env.BUILD_TYPE}} 
+
+      - name: Generate Coverage Report
+        working-directory: ${{github.workspace}}
+        run: |
+          gcovr --xml-pretty -f src > coverage.xml
+          cat coverage.xml
+
+      - uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.xml # optional
+          verbose: true
