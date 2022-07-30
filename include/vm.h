@@ -21,9 +21,24 @@ enum class InterpretResult : std::uint8_t {
     } while (false)
 
 
-struct Compiler {
-    static void compile(const std::string_view source) {
+struct Scanner {
+    Scanner(const std::string_view source) {
+        start = source.begin();
+        current = source.begin();
+        line = 1;
     }
+
+    std::string_view::iterator start;
+    std::string_view::iterator current;
+    std::size_t line;
+};
+
+struct Compiler {
+    void compile(const std::string_view source) {
+        scanner = Scanner(source);
+    }
+
+    Scanner scanner;
 };
 
 struct VM {
@@ -34,7 +49,7 @@ struct VM {
     //}
 
     [[nodiscard]] InterpretResult interpret(const std::string_view source) {
-        Compiler::compile(source);
+        compiler.compile(source);
         return InterpretResult::Ok;
     }
 
@@ -81,4 +96,5 @@ private:
     std::unique_ptr<Chunk> m_chunk;
     std::vector<std::uint8_t>::const_iterator m_ip;
     std::stack<Value> stack;
+    Compiler compiler;
 };
