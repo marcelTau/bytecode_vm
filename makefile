@@ -37,6 +37,8 @@ coverage: build test
 run: build
 	./$(build_dir)/$(exe_name)
 
+frun: build
+	./$(build_dir)/$(exe_name) test.lox
 clean:
 	make clean -C build
 

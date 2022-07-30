@@ -20,11 +20,22 @@ enum class InterpretResult : std::uint8_t {
       stack.push(a op b); \
     } while (false)
 
+
+struct Compiler {
+    static void compile(const std::string_view source) {
+    }
+};
+
 struct VM {
-    [[nodiscard]] InterpretResult interpret(const Chunk& chunk) {
-        m_chunk = std::make_unique<Chunk>(chunk);
-        m_ip = m_chunk->code.cbegin();
-        return run();
+    //[[nodiscard]] InterpretResult interpret(const Chunk& chunk) {
+        //m_chunk = std::make_unique<Chunk>(chunk);
+        //m_ip = m_chunk->code.cbegin();
+        //return run();
+    //}
+
+    [[nodiscard]] InterpretResult interpret(const std::string_view source) {
+        Compiler::compile(source);
+        return InterpretResult::Ok;
     }
 
 private:
