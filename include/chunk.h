@@ -8,6 +8,11 @@
 // OpCode.h
 enum class OpCode : std::uint8_t {
     Constant,
+    Add,
+    Subtract,
+    Multiply,
+    Divide,
+    Negate,
     Return,
 };
 
@@ -48,7 +53,7 @@ struct Chunk {
     }
 
     void disassembleChunk(const std::string_view name) const {
-        fmt::print("== {} ==\n", name);
+        fmt::print("== {} ({}) ==\n", name, code.size());
 
         for (std::size_t offset = 0; offset < code.size();) {
             offset = disassembleInstruction(offset);
@@ -67,15 +72,17 @@ struct Chunk {
         const auto instruction = static_cast<OpCode>(code[offset]);
 
         switch (instruction) {
-            case OpCode::Constant:
-                return constantInstruction("Constant", offset);
-            case OpCode::Return:
-                return simpleInstruction("Return", offset);
+            case OpCode::Constant: return constantInstruction("Constant", offset);
+            case OpCode::Add: return simpleInstruction("Add", offset);
+            case OpCode::Subtract: return simpleInstruction("Subtract", offset);
+            case OpCode::Multiply: return simpleInstruction("Multiply", offset);
+            case OpCode::Divide: return simpleInstruction("Divide", offset);
+            case OpCode::Negate: return simpleInstruction("Negate", offset);
+            case OpCode::Return: return simpleInstruction("Return", offset);
             default:
                 fmt::print("Unknown opcode {}\n", instruction);
                 return offset + 1;
         }
-        return 0;
     }
 
     [[nodiscard]] std::size_t simpleInstruction(const std::string_view name, std::size_t offset) const {
@@ -96,7 +103,6 @@ struct Chunk {
 
     std::vector<std::uint8_t> code;
     std::vector<Value> constants;
-private:
     std::vector<std::size_t> lines;
 };
 
