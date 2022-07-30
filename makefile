@@ -1,6 +1,6 @@
 
 build_dir	= build
-exe_name 	= TODO_ChangeExecutableName
+exe_name 	= Bytecode-VM
 
 # name of the test target in the build makefile
 test_name 	= Tests
