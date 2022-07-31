@@ -5,6 +5,21 @@
 #include "chunk.h"
 #include "scanner.h"
 
+
+enum class Precedence : std::uint8_t {
+    None,
+    Assignment,  // =
+    Or,          // or
+    And,         // and
+    Equality,    // == !=
+    Comparison,  // < > <= >=
+    Term,        // + -
+    Factor,      // * /
+    Unary,       // ! -
+    Call,        // . ()
+    Primary
+};
+
 struct Parser {
     Parser() = default;
     Token current;
@@ -23,17 +38,17 @@ struct Compiler {
             std::bind(&Compiler::number, this)
         };
     }
-
     [[nodiscard]] bool compile(const std::string_view source);
-
 
 private:
     void advance();
     void consume(TokenType type, const char *msg);
     void expression();
 
+    void parsePrecedence(Precedence precedence);
     void number();
     void grouping();
+    void unary();
 
     template<typename opcode>
     requires IsOpcode<opcode>

@@ -1,5 +1,6 @@
 #include "compiler.h"
 #include "opcode.h"
+#include <cassert>
 
 bool Compiler::compile(const std::string_view source) {
     scanner = Scanner(source);
@@ -31,6 +32,7 @@ void Compiler::advance() {
 }
 
 void Compiler::expression() {
+    parsePrecedence(Precedence::Assignment);
 }
 
 void Compiler::number() {
@@ -41,6 +43,17 @@ void Compiler::number() {
 void Compiler::grouping() {
     expression();
     consume(TokenType::RightParen, "Expect ')' after expression.");
+}
+
+void Compiler::unary() {
+    auto operatorType = parser.previous.type;
+
+    parsePrecedence(Precedence::Unary);
+
+    switch (operatorType) {
+        case TokenType::Minus: return emitByte(OpCode::Negate);
+        default: assert(false && "Unreachable TokenType in unary expression");
+    }
 }
 
 void Compiler::consume(TokenType type, const char *msg) {
