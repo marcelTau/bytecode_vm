@@ -1,9 +1,24 @@
 #include <gtest/gtest.h>
 
-#include "header.h"
+#include "scanner.h"
 
-TEST(TODO_WriteTests, TODO_WriteTestsDescription) {
+TEST(scanner, tokentype) {
+    std::string_view lexeme = "for";
+    Scanner s(lexeme);
+    auto token = s.scanToken();
+    EXPECT_EQ(token.type, TokenType::For);
 }
 
-TEST(ActuallyDoSomething, xxx) {
+TEST(scanner, full_compare) {
+    std::string_view lexeme = "for";
+    Scanner s(lexeme);
+    Token expected = Token {
+        .type { TokenType::For },
+        .start { lexeme.begin() },
+        .length { 3 },
+        .line { 1 },
+    };
+    auto token = s.scanToken();
+    EXPECT_EQ(token.type, TokenType::For);
+    EXPECT_EQ(token, expected);
 }

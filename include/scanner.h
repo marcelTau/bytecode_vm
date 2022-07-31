@@ -19,7 +19,9 @@ private:
     [[nodiscard]] char peekNext() const;
     [[nodiscard]] bool match(char expected);
     [[nodiscard]] bool isAlpha(char c);
+
     [[nodiscard]] TokenType identifierType();
+    [[nodiscard]] TokenType checkKeyword(std::size_t start, std::size_t length, const char *rest, TokenType type);
 
     [[nodiscard]] Token string();
     [[nodiscard]] Token number();

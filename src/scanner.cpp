@@ -57,6 +57,40 @@ Token Scanner::identifier() {
 }
 
 TokenType Scanner::identifierType() {
+
+    switch (*m_start) {
+        case 'a': return checkKeyword(1, 2, "nd", TokenType::And);
+        case 'c': return checkKeyword(1, 4, "lass", TokenType::Class);
+        case 'e': return checkKeyword(1, 3, "lse", TokenType::Else);
+        case 'f': {
+            if (std::distance(m_start, m_current) > 1) {
+                switch (*(m_start + 1)) {
+                    case 'a': return checkKeyword(2, 3, "lse", TokenType::False);
+                    case 'o': return checkKeyword(2, 1, "r", TokenType::For);
+                    case 'u': return checkKeyword(2, 1, "n", TokenType::Fun);
+                }
+            }
+            break;
+        }
+        case 'i': return checkKeyword(1, 1, "f", TokenType::If);
+        case 'n': return checkKeyword(1, 2, "il", TokenType::Nil);
+        case 'o': return checkKeyword(1, 1, "r", TokenType::Or);
+        case 'p': return checkKeyword(1, 4, "rint", TokenType::Print);
+        case 'r': return checkKeyword(1, 5, "eturn", TokenType::Return);
+        case 's': return checkKeyword(1, 4, "uper", TokenType::Super);
+        case 'v': return checkKeyword(1, 2, "ar", TokenType::Var);
+        case 'w': return checkKeyword(1, 4, "hile", TokenType::While);
+    }
+
+    return TokenType::Identifier;
+}
+
+TokenType Scanner::checkKeyword(std::size_t start, std::size_t length, const char *rest, TokenType type) {
+    const bool sizeMatch = std::distance(m_start, m_current) == static_cast<long>(start + length);
+    const bool contentMatch = std::memcmp(m_start + start, rest, length) == 0;
+    if (sizeMatch && contentMatch) {
+        return type;
+    }
     return TokenType::Identifier;
 }
 

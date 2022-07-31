@@ -77,3 +77,25 @@ struct Token {
     std::size_t length;
     std::size_t line;
 };
+[[nodiscard]] constexpr bool operator==(const Token& lhs, const Token& rhs) {
+    return rhs.type == lhs.type &&
+           rhs.line == lhs.line &&
+           rhs.length == lhs.length &&
+           rhs.start == lhs.start;
+}
+
+[[nodiscard]] [[maybe_unused]] static std::ostream& operator<<(std::ostream& os, const Token& t) {
+    os << fmt::format("TokenType: {}\nLine: {}\nLength: {}\nStart: {}", t.type, t.line, t.length, *t.start);
+    return os;
+}
+
+
+
+
+
+
+
+
+
+
+
