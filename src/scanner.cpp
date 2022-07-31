@@ -78,6 +78,15 @@ TokenType Scanner::identifierType() {
         case 'p': return checkKeyword(1, 4, "rint", TokenType::Print);
         case 'r': return checkKeyword(1, 5, "eturn", TokenType::Return);
         case 's': return checkKeyword(1, 4, "uper", TokenType::Super);
+        case 't': {
+            if (std::distance(m_start, m_current) > 1) {
+                switch (*(m_start + 1)) {
+                    case 'h': return checkKeyword(2, 2, "is", TokenType::This);
+                    case 'r': return checkKeyword(2, 2, "ue", TokenType::True);
+                }
+            }
+            break;
+        }
         case 'v': return checkKeyword(1, 2, "ar", TokenType::Var);
         case 'w': return checkKeyword(1, 4, "hile", TokenType::While);
     }
