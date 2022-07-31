@@ -1,8 +1,18 @@
 #include "vm.h"
 
 InterpretResult VM::interpret(const std::string_view source) {
-    compiler.compile(source);
-    return InterpretResult::Ok;
+    Chunk chunk;
+
+    Compiler compiler(chunk);
+
+    // @todo errorhandling
+    if (not compiler.compile(source)) {
+        return InterpretResult::CompileError;
+    }
+
+    m_chunk = std::make_unique<Chunk>(chunk);
+    m_ip = m_chunk->code.begin();
+    return run();
 }
 
 InterpretResult VM::run() {

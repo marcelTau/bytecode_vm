@@ -31,5 +31,4 @@ private:
     std::unique_ptr<Chunk> m_chunk;
     std::vector<std::uint8_t>::const_iterator m_ip;
     std::stack<Value> stack;
-    Compiler compiler;
 };

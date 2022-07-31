@@ -68,7 +68,51 @@ constexpr auto fmt::formatter<TokenType>::parse(ParseContext& ctx) {
 template<typename FormatContext>
 auto fmt::formatter<TokenType>::format(const TokenType& type, FormatContext& ctx)
 {
-    return fmt::format_to(ctx.out(), "TODO match on TokenType: {}", static_cast<std::uint8_t>(type));
+    using enum TokenType;
+    std::string name;
+    switch (type) {
+        case LeftParen: name = "LeftParen"; break;
+        case RightParen: name = "RightParen"; break;
+        case LeftBrace: name = "LeftBrace"; break;
+        case RightBrace: name = "RightBrace"; break;
+        case Comma: name = "Comma"; break;
+        case Dot: name = "Dot"; break;
+        case Minus: name = "Minus"; break;
+        case Plus: name = "Plus"; break;
+        case Semicolon: name = "Semicolon"; break;
+        case Slash: name = "Slash"; break;
+        case Star: name = "Star"; break;
+        case Bang: name = "Bang"; break;
+        case BangEqual: name = "BangEqual"; break;
+        case Equal: name = "Equal"; break;
+        case EqualEquaL: name = "EqualEquaL"; break;
+        case Greater: name = "Greater"; break;
+        case GreaterEqual: name = "GreaterEqual"; break;
+        case Less: name = "Less"; break;
+        case LessEqual: name = "LessEqual"; break;
+        case Identifier: name = "Identifier"; break;
+        case String: name = "String"; break;
+        case Number: name = "Number"; break;
+        case And: name = "And"; break;
+        case Class: name = "Class"; break;
+        case Else: name = "Else"; break;
+        case False: name = "False"; break;
+        case For: name = "For"; break;
+        case Fun: name = "Fun"; break;
+        case If: name = "If"; break;
+        case Nil: name = "Nil"; break;
+        case Or: name = "Or"; break;
+        case Print: name = "Print"; break;
+        case Return: name = "Return"; break;
+        case Super: name = "Super"; break;
+        case This: name = "This"; break;
+        case True: name = "True"; break;
+        case Var: name = "Var"; break;
+        case While: name = "While"; break;
+        case Error: name = "Error"; break;
+        case Eof: name = "Eof"; break;
+    }
+    return fmt::format_to(ctx.out(), "{}", name);
 }
 
 struct Token {
@@ -77,6 +121,7 @@ struct Token {
     std::size_t length;
     std::size_t line;
 };
+
 [[nodiscard]] constexpr bool operator==(const Token& lhs, const Token& rhs) {
     return rhs.type == lhs.type &&
            rhs.line == lhs.line &&
