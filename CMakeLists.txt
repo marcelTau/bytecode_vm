@@ -15,8 +15,19 @@ endif()
 
 set(EXE_NAME Bytecode-VM)
 
-set(SOURCES src/vm.cpp)
-set(HEADERS include/vm.h)
+set(SOURCES 
+    src/chunk.cpp
+    src/compiler.cpp
+    src/vm.cpp
+)
+set(HEADERS
+    include/chunk.h 
+    include/compiler.h  
+    include/opcode.h  
+    include/scanner.h  
+    include/token.h  
+    include/vm.h
+)
 set(MAIN src/main.cpp)
 
 set(CMAKE_CXX_STANDARD 20)

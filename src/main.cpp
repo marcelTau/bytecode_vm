@@ -14,7 +14,7 @@ static int repl() {
         std::string input;
 
         std::cin >> input;
-        vm.interpret(input);
+        std::ignore = vm.interpret(input);
     }
 
     return 0;
