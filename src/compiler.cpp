@@ -2,7 +2,7 @@
 
 void Compiler::compile(const std::string_view source) {
     scanner = Scanner(source);
-    int line = -1;
+    std::size_t line = 1000;
     while (true) {
         Token token = scanner.scanToken();
         if (token.line != line) {

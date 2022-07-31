@@ -3,7 +3,51 @@
 #include <fmt/format.h>
 
 enum class TokenType : std::uint8_t {
-    Eof,
+    // Single-character tokens.
+    LeftParen,
+    RightParen,
+    LeftBrace,
+    RightBrace,
+    Comma,
+    Dot,
+    Minus,
+    Plus,
+    Semicolon,
+    Slash,
+    Star,
+    // One or two character tokens.
+    Bang,
+    BangEqual,
+    Equal,
+    EqualEquaL,
+    Greater,
+    GreaterEqual,
+    Less,
+    LessEqual,
+    // Literals.
+    Identifier,
+    String,
+    Number,
+    // Keywords.
+    And,
+    Class,
+    Else,
+    False,
+    For,
+    Fun,
+    If,
+    Nil,
+    Or,
+    Print,
+    Return,
+    Super,
+    This,
+    True,
+    Var,
+    While,
+
+    Error,
+    Eof
 };
 
 
@@ -28,8 +72,8 @@ auto fmt::formatter<TokenType>::format(const TokenType& type, FormatContext& ctx
 }
 
 struct Token {
-  TokenType type;
-  const char* start;
-  int length;
-  int line;
+    TokenType type;
+    std::string_view::iterator start;
+    std::size_t length;
+    std::size_t line;
 };

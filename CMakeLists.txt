@@ -19,6 +19,7 @@ set(SOURCES
     src/chunk.cpp
     src/compiler.cpp
     src/vm.cpp
+    src/scanner.cpp
 )
 set(HEADERS
     include/chunk.h 

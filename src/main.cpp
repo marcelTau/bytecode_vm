@@ -2,7 +2,6 @@
 #include <fstream>
 #include <iostream>
 #include <filesystem>
-#include "header.h"
 #include "chunk.h"
 #include "vm.h"
 
