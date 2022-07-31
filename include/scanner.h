@@ -20,7 +20,7 @@ private:
     void skipWhitespace();
 
 public:
-    std::string_view::iterator start;
-    std::string_view::iterator current;
-    std::size_t line;
+    std::string_view::iterator m_start;
+    std::string_view::iterator m_current;
+    std::size_t m_line;
 };

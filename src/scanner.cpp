@@ -2,14 +2,14 @@
 #include <cassert>
 
 Scanner::Scanner(const std::string_view source) {
-    start = source.begin();
-    current = source.begin();
-    line = 1;
+    m_start = source.begin();
+    m_current = source.begin();
+    m_line = 1;
 }
 
 Token Scanner::scanToken() {
     skipWhitespace();
-    start = current;
+    m_start = m_current;
 
     if (isAtEnd()) {
         return makeToken(TokenType::Eof);
@@ -40,11 +40,11 @@ Token Scanner::scanToken() {
 }
 
 bool Scanner::isAtEnd() const {
-    return *current == '\0';
+    return *m_current == '\0';
 }
 
 char Scanner::peek() const {
-    return *current;
+    return *m_current;
 }
 
 void Scanner::skipWhitespace() {
@@ -52,7 +52,7 @@ void Scanner::skipWhitespace() {
         char c = peek();
         if (std::isspace(c)) {
             if (c == '\n') {
-                line++;
+                m_line++;
             }
             std::ignore = advance();
         } else {
@@ -62,8 +62,8 @@ void Scanner::skipWhitespace() {
 }
 
 char Scanner::advance() {
-    current++;
-    return *(current - 1);
+    m_current++;
+    return *(m_current - 1);
 }
 
 bool Scanner::match(char expected) {
@@ -71,11 +71,11 @@ bool Scanner::match(char expected) {
         return false;
     }
 
-    if (*current != expected) {
+    if (*m_current != expected) {
         return false;
     }
 
-    current++;
+    m_current++;
     return true;
 }
 
@@ -84,17 +84,17 @@ Token Scanner::errorToken(const char *msg) const {
         .type { TokenType::Error },
         .start { msg },
         .length { std::strlen(msg) },
-        .line { line },
+        .line { m_line },
     };
 }
 
 Token Scanner::makeToken(const TokenType& type) const {
-    long distance = std::distance(start, current);
+    long distance = std::distance(m_start, m_current);
     assert(distance >= 0);
     return Token {
         .type { type },
-        .start { start },
+        .start { m_start },
         .length { static_cast<std::size_t>(distance) },
-        .line { line },
+        .line { m_line },
     };
 }
