@@ -15,7 +15,10 @@ private:
     [[nodiscard]] Token errorToken(const char *msg) const;
     [[nodiscard]] char advance();
     [[nodiscard]] char peek() const;
+    [[nodiscard]] char peekNext() const;
     [[nodiscard]] bool match(char expected);
+    [[nodiscard]] Token string();
+    [[nodiscard]] Token number();
 
     void skipWhitespace();
 

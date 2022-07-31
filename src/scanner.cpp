@@ -17,6 +17,10 @@ Token Scanner::scanToken() {
 
     char c = advance();
 
+    if (std::isdigit(c)) {
+        return number();
+    }
+
     switch (c) {
         case '(': return makeToken(TokenType::LeftParen);
         case ')': return makeToken(TokenType::RightParen);
@@ -33,10 +37,42 @@ Token Scanner::scanToken() {
         case '=': return makeToken(match('=') ? TokenType::EqualEquaL : TokenType::Equal);
         case '<': return makeToken(match('=') ? TokenType::LessEqual : TokenType::Less);
         case '>': return makeToken(match('=') ? TokenType::GreaterEqual : TokenType::Greater);
+        case '"': return string();
     }
 
 
     return errorToken("Unexpected character.");
+}
+
+Token Scanner::number() {
+    while (std::isdigit(peek())) {
+        std::ignore = advance();
+    }
+
+    if (peek() == '.' && std::isdigit(peekNext())) {
+        std::ignore = advance();
+        while (std::isdigit(peek())) {
+            std::ignore = advance();
+        }
+    }
+
+    return makeToken(TokenType::Number);
+}
+
+Token Scanner::string() {
+    while (peek() != '"' && not isAtEnd()) {
+        if (peek() == '\n') {
+            m_line++;
+        }
+        std::ignore = advance();
+    }
+
+    if (isAtEnd()) {
+        return errorToken("Unterminated string.");
+    }
+
+    std::ignore = advance();
+    return makeToken(TokenType::String);
 }
 
 bool Scanner::isAtEnd() const {
@@ -47,6 +83,13 @@ char Scanner::peek() const {
     return *m_current;
 }
 
+char Scanner::peekNext() const {
+    if (isAtEnd()) {
+        return '\0';
+    }
+    return *(m_current + 1);
+}
+
 void Scanner::skipWhitespace() {
     while (true) {
         char c = peek();
@@ -55,6 +98,10 @@ void Scanner::skipWhitespace() {
                 m_line++;
             }
             std::ignore = advance();
+        } else if (c == '/' && peekNext() == '/') { // comment
+            while (peek() == '/' && not isAtEnd()) {
+                std::ignore = advance();
+            }
         } else {
             return;
         }
