@@ -91,7 +91,7 @@ private:
     void expression();
 
     void parsePrecedence(Precedence precedence);
-    ParseRule getRule(TokenType);
+    [[nodiscard]] ParseRule getRule(TokenType);
     void number();
     void grouping();
     void unary();

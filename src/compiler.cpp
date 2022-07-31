@@ -73,6 +73,22 @@ void Compiler::binary() {
 }
 
 void Compiler::parsePrecedence(Precedence precedence) {
+    advance();
+
+    auto prefixRule = getRule(parser.previous.type).prefix;
+
+    if (not prefixRule) {
+        error("Expect expression.");
+        return;
+    }
+
+    prefixRule();
+
+    while (precedence <= getRule(parser.current.type).precedence) {
+        advance();
+        auto infixRule = getRule(parser.previous.type).infix;
+        infixRule();
+    }
 }
 
 ParseRule Compiler::getRule(TokenType type) {
