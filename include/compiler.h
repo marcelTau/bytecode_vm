@@ -33,6 +33,7 @@ private:
     void expression();
 
     void number();
+    void grouping();
 
     template<typename opcode>
     requires IsOpcode<opcode>

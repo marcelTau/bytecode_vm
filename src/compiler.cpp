@@ -38,6 +38,11 @@ void Compiler::number() {
     emitConstant(value);
 }
 
+void Compiler::grouping() {
+    expression();
+    consume(TokenType::RightParen, "Expect ')' after expression.");
+}
+
 void Compiler::consume(TokenType type, const char *msg) {
     if (parser.current.type == type) {
         advance();
