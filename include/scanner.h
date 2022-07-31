@@ -10,15 +10,20 @@ struct Scanner {
     [[nodiscard]] Token scanToken();
 
 private:
-    [[nodiscard]] bool isAtEnd() const;
     [[nodiscard]] Token makeToken(const TokenType& type) const;
     [[nodiscard]] Token errorToken(const char *msg) const;
+
+    [[nodiscard]] bool isAtEnd() const;
     [[nodiscard]] char advance();
     [[nodiscard]] char peek() const;
     [[nodiscard]] char peekNext() const;
     [[nodiscard]] bool match(char expected);
+    [[nodiscard]] bool isAlpha(char c);
+    [[nodiscard]] TokenType identifierType();
+
     [[nodiscard]] Token string();
     [[nodiscard]] Token number();
+    [[nodiscard]] Token identifier();
 
     void skipWhitespace();
 

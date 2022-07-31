@@ -1,5 +1,6 @@
 #include "scanner.h"
 #include <cassert>
+#include <cctype>
 
 Scanner::Scanner(const std::string_view source) {
     m_start = source.begin();
@@ -21,6 +22,10 @@ Token Scanner::scanToken() {
         return number();
     }
 
+    if (isAlpha(c)) {
+        return identifier();
+    }
+
     switch (c) {
         case '(': return makeToken(TokenType::LeftParen);
         case ')': return makeToken(TokenType::RightParen);
@@ -40,8 +45,19 @@ Token Scanner::scanToken() {
         case '"': return string();
     }
 
-
     return errorToken("Unexpected character.");
+}
+
+Token Scanner::identifier() {
+    while (isAlpha(peek()) || std::isdigit(peek())) {
+        std::ignore = advance();
+    }
+
+    return makeToken(identifierType());
+}
+
+TokenType Scanner::identifierType() {
+    return TokenType::Identifier;
 }
 
 Token Scanner::number() {
@@ -73,6 +89,10 @@ Token Scanner::string() {
 
     std::ignore = advance();
     return makeToken(TokenType::String);
+}
+
+bool Scanner::isAlpha(char c) {
+    return std::isalpha(c) || c == '_';
 }
 
 bool Scanner::isAtEnd() const {
