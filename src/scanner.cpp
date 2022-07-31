@@ -8,6 +8,7 @@ Scanner::Scanner(const std::string_view source) {
 }
 
 Token Scanner::scanToken() {
+    skipWhitespace();
     start = current;
 
     if (isAtEnd()) {
@@ -40,6 +41,24 @@ Token Scanner::scanToken() {
 
 bool Scanner::isAtEnd() const {
     return *current == '\0';
+}
+
+char Scanner::peek() const {
+    return *current;
+}
+
+void Scanner::skipWhitespace() {
+    while (true) {
+        char c = peek();
+        if (std::isspace(c)) {
+            if (c == '\n') {
+                line++;
+            }
+            std::ignore = advance();
+        } else {
+            return;
+        }
+    }
 }
 
 char Scanner::advance() {

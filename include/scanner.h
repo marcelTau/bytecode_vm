@@ -14,7 +14,10 @@ private:
     [[nodiscard]] Token makeToken(const TokenType& type) const;
     [[nodiscard]] Token errorToken(const char *msg) const;
     [[nodiscard]] char advance();
+    [[nodiscard]] char peek() const;
     [[nodiscard]] bool match(char expected);
+
+    void skipWhitespace();
 
 public:
     std::string_view::iterator start;
