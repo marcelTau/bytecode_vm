@@ -52,8 +52,31 @@ void Compiler::unary() {
 
     switch (operatorType) {
         case TokenType::Minus: return emitByte(OpCode::Negate);
-        default: assert(false && "Unreachable TokenType in unary expression");
+        default: assert(false && "Unreachable TokenType in unary expression.");
     }
+}
+
+void Compiler::binary() {
+    auto operatorType = parser.previous.type;
+    auto rule = getRule(operatorType);
+
+    auto newPrecedence = static_cast<std::uint8_t>(rule.precedence) + 1;
+    parsePrecedence(static_cast<Precedence>(newPrecedence));
+
+    switch (operatorType) {
+        case TokenType::Plus: return emitByte(OpCode::Add);
+        case TokenType::Minus: return emitByte(OpCode::Subtract);
+        case TokenType::Star: return emitByte(OpCode::Multiply);
+        case TokenType::Slash: return emitByte(OpCode::Divide);
+        default: assert(false && "Unreachable TokenType in binary expression.");
+    }
+}
+
+void Compiler::parsePrecedence(Precedence precedence) {
+}
+
+ParseRule Compiler::getRule(TokenType type) {
+    return TokenTypeFunction[static_cast<std::uint8_t>(type)];
 }
 
 void Compiler::consume(TokenType type, const char *msg) {
