@@ -7,13 +7,12 @@
 
 static int repl() {
     VM vm;
-    while (true) {
+
+    fmt::print("> ");
+    std::string line;
+    while (std::getline(std::cin, line)) {
+        std::ignore = vm.interpret(line);
         fmt::print("> ");
-
-        std::string input;
-
-        std::cin >> input;
-        std::ignore = vm.interpret(input);
     }
 
     return 0;

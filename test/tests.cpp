@@ -6,14 +6,14 @@
 
 TEST(scanner, tokentype) {
     std::string_view lexeme = "for";
-    Scanner s(lexeme);
+    Scanner s(lexeme.data());
     auto token = s.scanToken();
     EXPECT_EQ(token.type, TokenType::For);
 }
 
 TEST(scanner, full_compare) {
     std::string_view lexeme = "for";
-    Scanner s(lexeme);
+    Scanner s(lexeme.data());
     Token expected = Token {
         .type { TokenType::For },
         .start { lexeme.begin() },
@@ -25,14 +25,19 @@ TEST(scanner, full_compare) {
     EXPECT_EQ(token, expected);
 }
 
-TEST(compiler, check_the_concept) {
-    Chunk c;
-    Compiler cc(c);
+TEST(compiler, eof_token_at_the_end) {
+    std::string_view sv = "1 + 2;";
+    Scanner s(sv.data());
 
-    std::ignore = cc.compile("print 1 + 2;");
-    EXPECT_EQ(true, false);
+    std::vector<Token> tokens;
+    while (true) {
+        tokens.push_back(s.scanToken());
+        if (tokens.back().type == TokenType::Eof) {
+            break;
+        }
+    }
+    EXPECT_EQ(tokens.back().type, TokenType::Eof);
 }
-
 
 
 

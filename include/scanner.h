@@ -5,7 +5,7 @@
 
 struct Scanner {
     Scanner() = default;
-    Scanner(const std::string_view source);
+    Scanner(const char *source);
 
     [[nodiscard]] Token scanToken();
 
@@ -30,7 +30,7 @@ private:
     void skipWhitespace();
 
 public:
-    std::string_view::iterator m_start;
-    std::string_view::iterator m_current;
+    const char *m_start;
+    const char *m_current;
     std::size_t m_line;
 };

@@ -5,7 +5,6 @@ InterpretResult VM::interpret(const std::string_view source) {
 
     Compiler compiler(chunk);
 
-    // @todo errorhandling
     if (not compiler.compile(source)) {
         return InterpretResult::CompileError;
     }

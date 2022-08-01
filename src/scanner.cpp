@@ -2,9 +2,9 @@
 #include <cassert>
 #include <cctype>
 
-Scanner::Scanner(const std::string_view source) {
-    m_start = source.begin();
-    m_current = source.begin();
+Scanner::Scanner(const char *source) {
+    m_start = source;
+    m_current = source;
     m_line = 1;
 }
 
@@ -12,20 +12,37 @@ Token Scanner::scanToken() {
     skipWhitespace();
     m_start = m_current;
 
+#ifdef DEBUG_PRINT_CODE
+        printf("*m_current: %d\n", *m_current);
+#endif
+
     if (isAtEnd()) {
+#ifdef DEBUG_PRINT_CODE
+        fmt::print("FOUND EOF TOKEN\n");
+#endif
         return makeToken(TokenType::Eof);
     }
 
     char c = advance();
+#ifdef DEBUG_PRINT_CODE
+        printf("1*m_current: %d | c: %d\n", *m_current, c);
+#endif
 
     if (std::isdigit(c)) {
         return number();
     }
 
+#ifdef DEBUG_PRINT_CODE
+        printf("2*m_current: %d | c: %d\n", *m_current, c);
+#endif
+
     if (isAlpha(c)) {
         return identifier();
     }
 
+#ifdef DEBUG_PRINT_CODE
+        printf("3*m_current: %d | c: %d\n", *m_current, c);
+#endif
     switch (c) {
         case '(': return makeToken(TokenType::LeftParen);
         case ')': return makeToken(TokenType::RightParen);
@@ -63,8 +80,8 @@ TokenType Scanner::identifierType() {
         case 'c': return checkKeyword(1, 4, "lass", TokenType::Class);
         case 'e': return checkKeyword(1, 3, "lse", TokenType::Else);
         case 'f': {
-            if (std::distance(m_start, m_current) > 1) {
-                switch (*(m_start + 1)) {
+            if (m_current - m_start > 1) {
+                switch (m_start[1]) {
                     case 'a': return checkKeyword(2, 3, "lse", TokenType::False);
                     case 'o': return checkKeyword(2, 1, "r", TokenType::For);
                     case 'u': return checkKeyword(2, 1, "n", TokenType::Fun);
@@ -79,8 +96,8 @@ TokenType Scanner::identifierType() {
         case 'r': return checkKeyword(1, 5, "eturn", TokenType::Return);
         case 's': return checkKeyword(1, 4, "uper", TokenType::Super);
         case 't': {
-            if (std::distance(m_start, m_current) > 1) {
-                switch (*(m_start + 1)) {
+            if (m_current - m_start > 1) {
+                switch (m_start[1]) {
                     case 'h': return checkKeyword(2, 2, "is", TokenType::This);
                     case 'r': return checkKeyword(2, 2, "ue", TokenType::True);
                 }
@@ -95,7 +112,7 @@ TokenType Scanner::identifierType() {
 }
 
 TokenType Scanner::checkKeyword(std::size_t start, std::size_t length, const char *rest, TokenType type) {
-    const bool sizeMatch = std::distance(m_start, m_current) == static_cast<long>(start + length);
+    const bool sizeMatch = m_current - m_start == static_cast<long>(start + length);
     const bool contentMatch = std::memcmp(m_start + start, rest, length) == 0;
     if (sizeMatch && contentMatch) {
         return type;
@@ -139,6 +156,12 @@ bool Scanner::isAlpha(char c) {
 }
 
 bool Scanner::isAtEnd() const {
+#ifdef DEBUG_PRINT_CODE
+    printf("is_at_end: %d\n", *m_current);
+    if (*m_current == '\0') {
+        fmt::print("IS AT END\n");
+    }
+#endif
     return *m_current == '\0';
 }
 
@@ -150,30 +173,48 @@ char Scanner::peekNext() const {
     if (isAtEnd()) {
         return '\0';
     }
-    return *(m_current + 1);
+    return m_current[1];
 }
 
 void Scanner::skipWhitespace() {
     while (true) {
         char c = peek();
-        if (std::isspace(c)) {
-            if (c == '\n') {
-                m_line++;
-            }
-            std::ignore = advance();
-        } else if (c == '/' && peekNext() == '/') { // comment
-            while (peek() == '/' && not isAtEnd()) {
+
+#ifdef DEBUG_PRINT_CODE
+        printf("skip: *m_current: %d | c: %d\n", *m_current, c);
+#endif
+
+        switch (c) {
+            case ' ': [[fallthrough]];
+            case '\r': [[fallthrough]];
+            case '\t': {
                 std::ignore = advance();
+                break;
             }
-        } else {
-            return;
+            case '\n': {
+                m_line++;
+                std::ignore = advance();
+                break;
+            }
+            case '/': {
+                if (peekNext() == '/') {
+                    while (peek() != '\n' && not isAtEnd()) {
+                        std::ignore = advance();
+                    }
+                } else {
+                    return;
+                }
+                break;
+            }
+            default:
+                return;
         }
     }
 }
 
 char Scanner::advance() {
     m_current++;
-    return *(m_current - 1);
+    return m_current[-1];
 }
 
 bool Scanner::match(char expected) {
@@ -199,7 +240,7 @@ Token Scanner::errorToken(const char *msg) const {
 }
 
 Token Scanner::makeToken(const TokenType& type) const {
-    long distance = std::distance(m_start, m_current);
+    long distance = m_current - m_start;
     assert(distance >= 0);
     return Token {
         .type { type },

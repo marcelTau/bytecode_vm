@@ -1,9 +1,10 @@
 #include "compiler.h"
 #include "opcode.h"
 #include <cassert>
+#include <iostream>
 
 bool Compiler::compile(const std::string_view source) {
-    scanner = Scanner(source);
+    scanner = Scanner(source.data());
 
     parser.panicMode = false;
     parser.hadError = false;
@@ -14,8 +15,14 @@ bool Compiler::compile(const std::string_view source) {
 
     // @todo this is endCompiler()
     emitReturn();
+#ifdef DEBUG_PRINT_CODE
+    if (not parser.hadError) {
+        chunk.disassembleChunk("code");
+    }
+#endif
 
-    return !parser.hadError;
+
+    return not parser.hadError;
 }
 
 void Compiler::advance() {
@@ -23,6 +30,10 @@ void Compiler::advance() {
 
     while (true) {
         parser.current = scanner.scanToken();
+
+#ifdef DEBUG_PRINT_CODE
+        fmt::print("ADVANCE: {}\n", parser.current.type);
+#endif
 
         if (parser.current.type != TokenType::Error) {
             break;
@@ -60,7 +71,9 @@ void Compiler::binary() {
     auto operatorType = parser.previous.type;
     auto rule = getRule(operatorType);
 
+
     auto newPrecedence = static_cast<std::uint8_t>(rule.precedence) + 1;
+    fmt::print("Precedence of {}: {} -> {}", operatorType, (int)rule.precedence, newPrecedence);
     parsePrecedence(static_cast<Precedence>(newPrecedence));
 
     switch (operatorType) {
