@@ -30,7 +30,7 @@ private:
     void skipWhitespace();
 
 public:
-    const char *m_start;
-    const char *m_current;
-    std::size_t m_line;
+    const char *m_start { nullptr };
+    const char *m_current { nullptr };
+    std::size_t m_line = 1;
 };

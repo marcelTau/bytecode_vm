@@ -21,7 +21,6 @@ bool Compiler::compile(const std::string_view source) {
     }
 #endif
 
-
     return not parser.hadError;
 }
 

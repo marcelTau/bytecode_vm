@@ -1,6 +1,5 @@
 #include "chunk.h"
 
-
 void Chunk::push(OpCode opcode, std::size_t line) {
     code.push_back(static_cast<std::uint8_t>(opcode));
     lines.push_back(line);
@@ -56,6 +55,7 @@ std::size_t Chunk::addConstant(const Value& value) {
 
 std::size_t Chunk::constantInstruction(const std::string_view name, std::size_t offset) const {
     std::uint8_t constant = code[offset + 1];
-    fmt::print("{:16} {:4d} '{}'\n", name, constant, constants[constant]);
+    auto variant = constants[constant];
+    fmt::print("{:16} {:4d} '{}'\n", name, constant, std::visit(PrintVisitor{}, variant));
     return offset + 2;
 }

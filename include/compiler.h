@@ -28,8 +28,8 @@ struct ParseRule {
 
 struct Parser {
     Parser() = default;
-    Token current;
-    Token previous;
+    Token current {};
+    Token previous {};
     bool hadError { false };
     bool panicMode { false };
 };
@@ -41,7 +41,7 @@ struct Compiler {
 
     Compiler(Chunk& chunk) : chunk(chunk) {
         TokenTypeFunction = {
-           /*TOKEN_LEFT_PAREN */   ParseRule {.prefix { std::bind(&Compiler::grouping, this) }, .infix {nullptr }, .precedence {   Precedence::None} },
+           /*TOKEN_LEFT_PAREN */   ParseRule {.prefix { std::bind(&Compiler::grouping, this) }, .infix { nullptr }, .precedence {   Precedence::None} },
            /*TOKEN_RIGHT_PAREN */  ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_LEFT_BRACE */   ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} }, 
            /*TOKEN_RIGHT_BRACE */  ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
@@ -62,7 +62,7 @@ struct Compiler {
            /*TOKEN_LESS_EQUAL */   ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_IDENTIFIER */   ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_STRING */       ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
-           /*TOKEN_NUMBER */       ParseRule {.prefix { std::bind(&Compiler::number, this) }, .infix {  nullptr }, .precedence { Precedence::None} },
+           /*TOKEN_NUMBER */       ParseRule {.prefix { std::bind(&Compiler::number, this) }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_AND */          ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_CLASS */        ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_ELSE */         ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },

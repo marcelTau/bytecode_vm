@@ -39,6 +39,11 @@ TEST(compiler, eof_token_at_the_end) {
     EXPECT_EQ(tokens.back().type, TokenType::Eof);
 }
 
+TEST(ValuePrinter, correct_print_for_all_types) {
+    Value v { 2.3f };
+    EXPECT_EQ(std::visit(PrintVisitor{}, v), "2.3");
+}
+
 
 
 

@@ -4,10 +4,18 @@
 #include <fmt/format.h>
 #include <string_view>
 #include <vector>
+#include <variant>
 #include "opcode.h"
 
-// @todo refactor this
-using Value = double;
+using Number = double;
+using Nil = std::monostate;
+using Value = std::variant<bool, Number, Nil>;
+
+struct PrintVisitor {
+    std::string operator()(bool t) { return t ? "true" : "false"; }
+    std::string operator()(Number t) { return std::to_string(t); }
+    std::string operator()(Nil) { return "Nil"; }
+};
 
 struct Chunk {
     void push(OpCode opcode, std::size_t line);
