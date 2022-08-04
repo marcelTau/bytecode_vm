@@ -11,10 +11,17 @@ using Number = double;
 using Nil = std::monostate;
 using Value = std::variant<bool, Number, Nil>;
 
+/**
+* @brief Visitor that returns the string representation of every case in the Value variant.
+*        IMPORTANT all the types in the Value variant have to be printable by fmt::format or
+*        should have a special case defined.
+*/
 struct PrintVisitor {
-    std::string operator()(bool t) { return t ? "true" : "false"; }
-    std::string operator()(Number t) { return std::to_string(t); }
+    // The Nil (std::monostate) variant cannot be formatted by fmt::format by default, so we can catch it here.
     std::string operator()(Nil) { return "Nil"; }
+
+    // This matches every other type than std::monostate. 
+    std::string operator()(const auto& x) { return fmt::format("{}", x); }
 };
 
 struct Chunk {
