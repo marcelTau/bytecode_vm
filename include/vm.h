@@ -12,13 +12,25 @@ enum class InterpretResult : std::uint8_t {
     RuntimeError,
 };
 
+// we have to push b in the error case since we can't peek the stack beforehand
 #define BINARY_OP(op) \
     do { \
       auto b = stack.top(); \
+      if (not std::holds_alternative<Number>(b)) { \
+        fmt::print(stderr, "todo make this a runtime_error ..."); \
+        return InterpretResult::RuntimeError; \
+      }\
       stack.pop(); \
       auto a = stack.top(); \
+      if (not std::holds_alternative<Number>(a)) {\
+        fmt::print(stderr, "todo make this a runtime_error aswell ...");\
+        stack.push(b); \
+        return InterpretResult::RuntimeError; \
+      }\
       stack.pop(); \
-      stack.push(a op b); \
+      const auto a_value = std::get<Number>(a);\
+      const auto b_value = std::get<Number>(b);\
+      stack.push(a_value op b_value); \
     } while (false)
 
 class VM {

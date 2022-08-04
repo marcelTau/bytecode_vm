@@ -22,7 +22,7 @@ InterpretResult VM::run() {
         const auto distance = std::distance(m_chunk->code.cbegin(), m_ip);
         fmt::print("          ");
         for (auto dump = stack; not dump.empty(); dump.pop()) {
-            fmt::print("[ {} ]", dump.top());
+            fmt::print("[ {} ]", std::visit(PrintVisitor{}, dump.top()));
         }
         fmt::print("\n");
         std::ignore = m_chunk->disassembleInstruction(static_cast<std::size_t>(distance));
@@ -40,12 +40,17 @@ InterpretResult VM::run() {
             case OpCode::Divide: { BINARY_OP(/); break; }
             case OpCode::Negate: {
                 const auto last = stack.top();
+                if (not std::holds_alternative<Number>(last)) {
+                    fmt::print(stderr, "Operand must be a number.");
+                    return InterpretResult::RuntimeError;
+                }
+                const auto value = std::get<Number>(last);
                 stack.pop();
-                stack.push(-last);
+                stack.push(-value);
                 break;
             }
             case OpCode::Return: {
-                fmt::print("{}\n", stack.top());
+                fmt::print("{}\n", std::visit(PrintVisitor{}, stack.top()));
                 stack.pop();
                 return InterpretResult::Ok;
             }
