@@ -96,7 +96,7 @@ void VM::resetStack() {
 bool VM::isFalsey(const Value& value) {
     return (
         std::holds_alternative<Nil>(value) ||
-        (std::holds_alternative<bool>(value) && std::get<bool>(value) == false)
+        (std::holds_alternative<Bool>(value) && std::get<Bool>(value) == false)
     );
 }
 

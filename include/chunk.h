@@ -7,24 +7,38 @@
 #include <variant>
 #include "opcode.h"
 
+// StackAllocated DataTypes
 using Number = double;
+using Bool = bool;
 using Nil = std::monostate;
-using Value = std::variant<bool, Number, Nil>;
+
+// HeapAllocated DataTypes
+using Obj = std::variant<std::string, std::monostate>;
+
+// Value Variant holding all types
+using Value = std::variant<Bool, Number, Nil, Obj>;
 
 /**
-* @brief Visitor that returns the string representation of every case in the Value variant.
-*        IMPORTANT all the types in the Value variant have to be printable by fmt::format or
-*        should have a special case defined.
-*/
+ * @brief Visitor that returns the string representation of every case in the Value variant.
+ *        IMPORTANT all the types in the Value variant have to be printable by fmt::format or
+ *        should have a special case defined.
+ */
 struct PrintVisitor {
     // The Nil (std::monostate) variant cannot be formatted by fmt::format by default, so we can catch it here.
     std::string operator()(Nil) { return "Nil"; }
-    std::string operator()(bool b) { return b ? "true" : "false"; }
+    std::string operator()(Bool b) { return b ? "true" : "false"; }
+    std::string operator()(const Obj& obj) { return std::visit(PrintVisitor{}, obj); }
 
     // This matches every other type than std::monostate. 
     std::string operator()(const auto& x) { return fmt::format("{}", x); }
 };
 
+/**
+ * @brief Visitor that checks if the values holds in two different
+ *        std::variants are the same type and the same value. It returns false
+ *        in every other case.
+ *
+ */
 struct EqualityVisitor {
     template<typename T>
     bool operator()(const T& a, const T& b) {
