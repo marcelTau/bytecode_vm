@@ -1,4 +1,5 @@
 #include "vm.h"
+#include <cassert>
 
 
 InterpretResult VM::interpret(const std::string_view source) {
@@ -34,30 +35,35 @@ InterpretResult VM::run() {
                 auto constant = readConstant();
                 m_stack.push(constant);
                 break;
-            };
+            }
             case OpCode::Nil: { m_stack.push(Nil{}); break; };
             case OpCode::True: { m_stack.push(true); break; };
             case OpCode::False: { m_stack.push(false); break; };
             case OpCode::Equal: {
-                 const auto b = m_stack.top();
-                 m_stack.pop();
-                 const auto a = m_stack.top();
-                 m_stack.pop();
-                 m_stack.push(valuesEqual(a, b));
-                 break;
+                const auto b = pop();
+                const auto a = pop();
+                m_stack.push(valuesEqual(a, b));
+                break;
             };
             case OpCode::Greater: { BINARY_OP(>); break; };
             case OpCode::Less: { BINARY_OP(<); break; };
-            case OpCode::Add: { BINARY_OP(+); break; };
-            case OpCode::Subtract: { BINARY_OP(-); break; };
-            case OpCode::Multiply: { BINARY_OP(*); break; };
-            case OpCode::Divide: { BINARY_OP(/); break; };
+            case OpCode::Add: { 
+                if (holds_obj_type<std::string>(peek()) && holds_obj_type<std::string>(peek(1))) {
+                    concatenate();
+                } else {
+                    BINARY_OP(+); 
+                }
+                break; 
+            };
+            case OpCode::Subtract: { BINARY_OP(-); break; }
+            case OpCode::Multiply: { BINARY_OP(*); break; }
+            case OpCode::Divide: { BINARY_OP(/); break; }
             case OpCode::Not: {
-                 const auto value = m_stack.top();
-                 m_stack.pop();
-                 const bool truthyness = isFalsey(value);
-                 m_stack.push(truthyness);
-                 break;
+                const auto value = m_stack.top();
+                m_stack.pop();
+                const bool truthyness = isFalsey(value);
+                m_stack.push(truthyness);
+                break;
             };
             case OpCode::Negate: {
                 const auto last = m_stack.top();
@@ -92,6 +98,12 @@ void VM::resetStack() {
     m_stack = {};
 }
 
+void VM::concatenate() {
+    // unchecked should be fine, since we're checking the types before in run()
+    auto b = get_objtype_unchecked<std::string>(pop());
+    auto a = get_objtype_unchecked<std::string>(pop());
+    m_stack.push(a + b);
+}
 
 bool VM::isFalsey(const Value& value) {
     return (
@@ -103,3 +115,42 @@ bool VM::isFalsey(const Value& value) {
 bool VM::valuesEqual(const Value& a, const Value& b) {
     return std::visit(EqualityVisitor{}, a, b);
 }
+
+Value VM::peek(std::size_t many) {
+    if (many == 0) {
+        return m_stack.top();
+    } else if (many == 1) {
+        auto tmpValue = pop();
+        auto retValue = m_stack.top();
+        m_stack.push(tmpValue);
+        return retValue;
+    }
+    assert(false && "peek is not implemented for numbers > 1.");
+}
+
+Value VM::pop() {
+    auto v = m_stack.top();
+    m_stack.pop();
+    return v;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

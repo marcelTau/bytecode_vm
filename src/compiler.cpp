@@ -95,6 +95,11 @@ void Compiler::literal() {
     }
 }
 
+void Compiler::string() {
+    std::string s(parser.previous.start + 1, parser.previous.length - 2);
+    emitConstant(s);
+}
+
 void Compiler::parsePrecedence(Precedence precedence) {
     advance();
 
@@ -158,11 +163,11 @@ void Compiler::emitReturn() {
     emitByte(OpCode::Return);
 }
 
-void Compiler::emitConstant(Value value) {
+void Compiler::emitConstant(const Value& value) {
     emitBytes(OpCode::Constant, makeConstant(value));
 }
 
-std::uint8_t Compiler::makeConstant(Value value) {
+std::uint8_t Compiler::makeConstant(const Value& value) {
     auto constant = chunk.addConstant(value);
     if (constant > UINT8_MAX) {
         error("Too many constants in one chunk.");

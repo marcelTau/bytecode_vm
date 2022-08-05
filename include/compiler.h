@@ -63,7 +63,7 @@ struct Compiler {
            /*TOKEN_LESS */         ParseRule {.prefix { nullptr }, .infix { BIND(binary) }, .precedence { Precedence::Comparison} },
            /*TOKEN_LESS_EQUAL */   ParseRule {.prefix { nullptr }, .infix { BIND(binary) }, .precedence { Precedence::Comparison} },
            /*TOKEN_IDENTIFIER */   ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
-           /*TOKEN_STRING */       ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
+           /*TOKEN_STRING */       ParseRule {.prefix { BIND(string) }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_NUMBER */       ParseRule {.prefix { BIND(number) }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_AND */          ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_CLASS */        ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
@@ -99,6 +99,7 @@ private:
     void unary();
     void binary();
     void literal();
+    void string();
 
     template<typename opcode>
     requires IsOpcode<opcode>
@@ -113,10 +114,10 @@ private:
         emitByte(byte2);
     }
 
-    void emitConstant(Value value);
+    void emitConstant(const Value& value);
     void emitReturn();
 
-    std::uint8_t makeConstant(Value value);
+    std::uint8_t makeConstant(const Value& value);
 
     void errorAtCurrent(const char *msg);
     void error(const char *msg);

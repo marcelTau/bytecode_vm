@@ -39,10 +39,13 @@ public:
     [[nodiscard]] InterpretResult interpret(const std::string_view source);
 private:
     void runtimeError(const char *msg);
-    [[nodiscard]] InterpretResult run();
     void resetStack(); 
+    void concatenate();
+    [[nodiscard]] InterpretResult run();
     [[nodiscard]] bool isFalsey(const Value& value);
     [[nodiscard]] bool valuesEqual(const Value& a, const Value& b);
+    [[nodiscard]] Value peek(std::size_t many = 0);
+    [[nodiscard]] Value pop();
 
 private:
     std::unique_ptr<Chunk> m_chunk;
