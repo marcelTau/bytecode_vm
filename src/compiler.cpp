@@ -30,10 +30,6 @@ void Compiler::advance() {
     while (true) {
         parser.current = scanner.scanToken();
 
-#ifdef DEBUG_PRINT_CODE
-        fmt::print("ADVANCE: {}\n", parser.current.type);
-#endif
-
         if (parser.current.type != TokenType::Error) {
             break;
         }
@@ -72,7 +68,6 @@ void Compiler::binary() {
 
 
     auto newPrecedence = static_cast<std::uint8_t>(rule.precedence) + 1;
-    fmt::print("Precedence of {}: {} -> {}", operatorType, (int)rule.precedence, newPrecedence);
     parsePrecedence(static_cast<Precedence>(newPrecedence));
 
     switch (operatorType) {

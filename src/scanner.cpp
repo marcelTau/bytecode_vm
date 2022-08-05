@@ -12,37 +12,20 @@ Token Scanner::scanToken() {
     skipWhitespace();
     m_start = m_current;
 
-#ifdef DEBUG_PRINT_CODE
-        printf("*m_current: %d\n", *m_current);
-#endif
-
     if (isAtEnd()) {
-#ifdef DEBUG_PRINT_CODE
-        fmt::print("FOUND EOF TOKEN\n");
-#endif
         return makeToken(TokenType::Eof);
     }
 
     char c = advance();
-#ifdef DEBUG_PRINT_CODE
-        printf("1*m_current: %d | c: %d\n", *m_current, c);
-#endif
 
     if (std::isdigit(c)) {
         return number();
     }
 
-#ifdef DEBUG_PRINT_CODE
-        printf("2*m_current: %d | c: %d\n", *m_current, c);
-#endif
-
     if (isAlpha(c)) {
         return identifier();
     }
 
-#ifdef DEBUG_PRINT_CODE
-        printf("3*m_current: %d | c: %d\n", *m_current, c);
-#endif
     switch (c) {
         case '(': return makeToken(TokenType::LeftParen);
         case ')': return makeToken(TokenType::RightParen);
@@ -156,12 +139,6 @@ bool Scanner::isAlpha(char c) {
 }
 
 bool Scanner::isAtEnd() const {
-#ifdef DEBUG_PRINT_CODE
-    printf("is_at_end: %d\n", *m_current);
-    if (*m_current == '\0') {
-        fmt::print("IS AT END\n");
-    }
-#endif
     return *m_current == '\0';
 }
 
@@ -179,10 +156,6 @@ char Scanner::peekNext() const {
 void Scanner::skipWhitespace() {
     while (true) {
         char c = peek();
-
-#ifdef DEBUG_PRINT_CODE
-        printf("skip: *m_current: %d | c: %d\n", *m_current, c);
-#endif
 
         switch (c) {
             case ' ': [[fallthrough]];
