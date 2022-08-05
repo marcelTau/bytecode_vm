@@ -42,6 +42,7 @@ private:
     [[nodiscard]] InterpretResult run();
     void resetStack(); 
     [[nodiscard]] bool isFalsey(const Value& value);
+    [[nodiscard]] bool valuesEqual(const Value& a, const Value& b);
 
 private:
     std::unique_ptr<Chunk> m_chunk;

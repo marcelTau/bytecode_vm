@@ -34,21 +34,31 @@ InterpretResult VM::run() {
                 auto constant = readConstant();
                 m_stack.push(constant);
                 break;
-            }
-            case OpCode::Nil: m_stack.push(Nil{}); break;
-            case OpCode::True: m_stack.push(true); break;
-            case OpCode::False: m_stack.push(false); break;
-            case OpCode::Add: { BINARY_OP(+); break; }
-            case OpCode::Subtract: { BINARY_OP(-); break; }
-            case OpCode::Multiply: { BINARY_OP(*); break; }
-            case OpCode::Divide: { BINARY_OP(/); break; }
+            };
+            case OpCode::Nil: { m_stack.push(Nil{}); break; };
+            case OpCode::True: { m_stack.push(true); break; };
+            case OpCode::False: { m_stack.push(false); break; };
+            case OpCode::Equal: {
+                 const auto b = m_stack.top();
+                 m_stack.pop();
+                 const auto a = m_stack.top();
+                 m_stack.pop();
+                 m_stack.push(valuesEqual(a, b));
+                 break;
+            };
+            case OpCode::Greater: { BINARY_OP(>); break; };
+            case OpCode::Less: { BINARY_OP(<); break; };
+            case OpCode::Add: { BINARY_OP(+); break; };
+            case OpCode::Subtract: { BINARY_OP(-); break; };
+            case OpCode::Multiply: { BINARY_OP(*); break; };
+            case OpCode::Divide: { BINARY_OP(/); break; };
             case OpCode::Not: {
                  const auto value = m_stack.top();
                  m_stack.pop();
                  const bool truthyness = isFalsey(value);
                  m_stack.push(truthyness);
                  break;
-            }
+            };
             case OpCode::Negate: {
                 const auto last = m_stack.top();
                 if (not std::holds_alternative<Number>(last)) {
@@ -59,7 +69,7 @@ InterpretResult VM::run() {
                 m_stack.pop();
                 m_stack.push(-value);
                 break;
-            }
+            };
             case OpCode::Return: {
                 fmt::print("{}\n", std::visit(PrintVisitor{}, m_stack.top()));
                 m_stack.pop();
@@ -88,4 +98,8 @@ bool VM::isFalsey(const Value& value) {
         std::holds_alternative<Nil>(value) ||
         (std::holds_alternative<bool>(value) && std::get<bool>(value) == false)
     );
+}
+
+bool VM::valuesEqual(const Value& a, const Value& b) {
+    return std::visit(EqualityVisitor{}, a, b);
 }

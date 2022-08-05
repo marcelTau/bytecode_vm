@@ -25,6 +25,21 @@ struct PrintVisitor {
     std::string operator()(const auto& x) { return fmt::format("{}", x); }
 };
 
+struct EqualityVisitor {
+    template<typename T>
+    bool operator()(const T& a, const T& b) {
+        return a == b;
+    }
+
+    template<typename T, typename U>
+    bool operator()(const T&, const U&) {
+#ifdef DEBUG_PRINT_CODE
+        fmt::print(stderr, "Equality operator failed with different types.");
+#endif
+        return false;
+    }
+};
+
 struct Chunk {
     void push(OpCode opcode, std::size_t line);
     void push(std::uint8_t opcode, std::size_t line);

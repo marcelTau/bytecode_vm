@@ -39,7 +39,7 @@ Token Scanner::scanToken() {
         case '/': return makeToken(TokenType::Slash);
         case '*': return makeToken(TokenType::Star);
         case '!': return makeToken(match('=') ? TokenType::BangEqual : TokenType::Bang);
-        case '=': return makeToken(match('=') ? TokenType::EqualEquaL : TokenType::Equal);
+        case '=': return makeToken(match('=') ? TokenType::EqualEqual : TokenType::Equal);
         case '<': return makeToken(match('=') ? TokenType::LessEqual : TokenType::Less);
         case '>': return makeToken(match('=') ? TokenType::GreaterEqual : TokenType::Greater);
         case '"': return string();

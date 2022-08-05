@@ -76,6 +76,12 @@ void Compiler::binary() {
         case TokenType::Minus: return emitByte(OpCode::Subtract);
         case TokenType::Star: return emitByte(OpCode::Multiply);
         case TokenType::Slash: return emitByte(OpCode::Divide);
+        case TokenType::BangEqual: return emitBytes(OpCode::Equal, OpCode::Not);
+        case TokenType::EqualEqual: return emitByte(OpCode::Equal);
+        case TokenType::Greater: return emitByte(OpCode::Greater);
+        case TokenType::GreaterEqual: return emitBytes(OpCode::Less, OpCode::Not);
+        case TokenType::Less: return emitByte(OpCode::Less);
+        case TokenType::LessEqual: return emitBytes(OpCode::Greater, OpCode::Not);
         default: assert(false && "Unreachable TokenType in binary expression.");
     }
 }

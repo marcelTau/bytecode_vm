@@ -19,7 +19,7 @@ enum class TokenType : std::uint8_t {
     Bang,
     BangEqual,
     Equal,
-    EqualEquaL,
+    EqualEqual,
     Greater,
     GreaterEqual,
     Less,
@@ -85,7 +85,7 @@ auto fmt::formatter<TokenType>::format(const TokenType& type, FormatContext& ctx
         case Bang: name = "Bang"; break;
         case BangEqual: name = "BangEqual"; break;
         case Equal: name = "Equal"; break;
-        case EqualEquaL: name = "EqualEquaL"; break;
+        case EqualEqual: name = "EqualEqual"; break;
         case Greater: name = "Greater"; break;
         case GreaterEqual: name = "GreaterEqual"; break;
         case Less: name = "Less"; break;
