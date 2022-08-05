@@ -102,17 +102,17 @@ void Compiler::expression() {
     parsePrecedence(Precedence::Assignment);
 }
 
-void Compiler::number() {
+void Compiler::number(bool) {
     auto value = std::strtod(parser.previous.start, NULL);
     emitConstant(value);
 }
 
-void Compiler::grouping() {
+void Compiler::grouping(bool) {
     expression();
     consume(TokenType::RightParen, "Expect ')' after expression.");
 }
 
-void Compiler::unary() {
+void Compiler::unary(bool) {
     auto operatorType = parser.previous.type;
 
     parsePrecedence(Precedence::Unary);
@@ -124,7 +124,7 @@ void Compiler::unary() {
     }
 }
 
-void Compiler::binary() {
+void Compiler::binary(bool) {
     auto operatorType = parser.previous.type;
     auto rule = getRule(operatorType);
 
@@ -147,7 +147,7 @@ void Compiler::binary() {
     }
 }
 
-void Compiler::literal() {
+void Compiler::literal(bool) {
     switch (parser.previous.type) {
         case TokenType::False: return emitByte(OpCode::False);
         case TokenType::Nil: return emitByte(OpCode::Nil);
@@ -156,18 +156,24 @@ void Compiler::literal() {
     }
 }
 
-void Compiler::string() {
+void Compiler::string(bool) {
     std::string s(parser.previous.start + 1, parser.previous.length - 2);
     emitConstant(s);
 }
 
-void Compiler::variable() {
-    namedVariable(parser.previous);
+void Compiler::variable(bool canAssign) {
+    namedVariable(parser.previous, canAssign);
 }
 
-void Compiler::namedVariable(const Token& name) {
+void Compiler::namedVariable(const Token& name, bool canAssign) {
     std::uint8_t arg = identifierConstant(name);
-    emitBytes(OpCode::GetGlobal, arg);
+
+    if (canAssign && match(TokenType::Equal)) {
+        expression();
+        emitBytes(OpCode::SetGlobal, arg);
+    } else {
+        emitBytes(OpCode::GetGlobal, arg);
+    }
 }
 
 void Compiler::parsePrecedence(Precedence precedence) {
@@ -180,12 +186,17 @@ void Compiler::parsePrecedence(Precedence precedence) {
         return;
     }
 
-    prefixRule();
+    bool canAssign = precedence <= Precedence::Assignment;
+    prefixRule(canAssign);
 
     while (precedence <= getRule(parser.current.type).precedence) {
         advance();
         auto infixRule = getRule(parser.previous.type).infix;
-        infixRule();
+        infixRule(canAssign);
+    }
+
+    if (canAssign && match(TokenType::Equal)) {
+        error("Invalid assignment target.");
     }
 }
 

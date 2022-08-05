@@ -19,7 +19,7 @@ enum class Precedence : std::uint8_t {
     Primary
 };
 
-using ParseFn = std::function<void()>;
+using ParseFn = std::function<void(bool)>;
 struct ParseRule {
     ParseFn prefix;
     ParseFn infix;
@@ -37,7 +37,7 @@ struct Parser {
 template <typename opcode>
 concept IsOpcode = std::is_same_v<opcode, std::uint8_t> || std::is_same_v<opcode, OpCode>;
 
-#define BIND(func_name) std::bind(&Compiler::func_name, this)
+#define BIND(func_name) std::bind(&Compiler::func_name, this, std::placeholders::_1)
 
 struct Compiler {
 
@@ -108,14 +108,14 @@ private:
     [[nodiscard]] bool match(TokenType type);
     [[nodiscard]] bool check(TokenType type);
 
-    void number();
-    void grouping();
-    void unary();
-    void binary();
-    void literal();
-    void string();
-    void variable();
-    void namedVariable(const Token& name);
+    void number(bool);
+    void grouping(bool);
+    void unary(bool);
+    void binary(bool);
+    void literal(bool);
+    void string(bool);
+    void variable(bool canAssign);
+    void namedVariable(const Token& name, bool canAssign);
 
     template<typename opcode>
     requires IsOpcode<opcode>

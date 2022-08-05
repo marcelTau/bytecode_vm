@@ -58,6 +58,19 @@ InterpretResult VM::run() {
                 std::ignore = pop();
                 break;
             };
+            case OpCode::SetGlobal: {
+                const auto name = get_objtype_unchecked<std::string>(readConstant());
+                try {
+                    // check if this key already exists
+                    globals.at(name);
+                    globals[name] = peek();
+                } catch (const std::exception&) {
+                    runtimeError(fmt::format("Undefined variable '{}'", name));
+                    return InterpretResult::RuntimeError;
+                }
+                break;
+                
+            }
             case OpCode::Equal: {
                 const auto b = pop();
                 const auto a = pop();
