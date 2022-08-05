@@ -97,9 +97,13 @@ private:
     void printStatement();
     void expressionStatement();
     void varDeclaration();
+    void declareVariable();
+    void addLocal(const Token& name);
+
 
     void parsePrecedence(Precedence precedence);
 
+    [[nodiscard]] bool identifiersEqual(const Token& lhs, const Token& rhs);
     [[nodiscard]] std::uint8_t parseVariable(const char *errorMessage);
     [[nodiscard]] std::uint8_t identifierConstant(const Token& name);
     void defineVariable(std::uint8_t global);
@@ -139,6 +143,8 @@ private:
     void error(const char *msg);
     void errorAt(Token& token, const char *msg);
     void synchronize();
+    void beginScope();
+    void endScope();
 
 private:
     struct Local {
@@ -149,9 +155,6 @@ private:
         std::array<Local, UINT8_MAX + 1> locals;
         int localCount { 0 };
         int scopeDepth { 0 };
-
-        void beginScope() { scopeDepth++; }
-        void endScope() { scopeDepth--; }
     } variables;
     std::array<ParseRule, 40> TokenTypeFunction;
     Scanner scanner;

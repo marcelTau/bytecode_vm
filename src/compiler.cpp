@@ -42,9 +42,9 @@ void Compiler::statement() {
     if (match(TokenType::Print)) {
         printStatement();
     } else if (match(TokenType::LeftBrace)) {
-        variables.beginScope();
+        beginScope();
         block();
-        variables.endScope();
+        endScope();
     } else {
         expressionStatement();
     }
@@ -84,8 +84,47 @@ void Compiler::varDeclaration() {
     defineVariable(global);
 }
 
+void Compiler::declareVariable() {
+    if (variables.scopeDepth > 0) {
+        return;
+    }
+    const auto name = parser.previous;
+    for (int i = variables.localCount - 1; i >= 0; --i) {
+        const auto& local = variables.locals[static_cast<std::size_t>(i)];
+        if (local.depth != -1 && local.depth < variables.scopeDepth) {
+            break;
+        }
+
+        if (identifiersEqual(name, local.name)) {
+            error("There is already a variable with this name in this scope.");
+        }
+    }
+    addLocal(name);
+}
+
+bool Compiler::identifiersEqual(const Token& lhs, const Token& rhs) {
+    if (lhs.length != rhs.length) {
+        return false;
+    }
+    return std::memcmp(lhs.start, rhs.start, lhs.length) == 0; // FIXME: check if this really works like this
+}
+
+void Compiler::addLocal(const Token& name) {
+    if (static_cast<std::size_t>(variables.localCount) == variables.locals.size()) {
+        error("Too many local variables in function.");
+        return;
+    }
+    Local& local = variables.locals[static_cast<std::size_t>(variables.localCount++)];
+    local.name = name;
+    local.depth = variables.scopeDepth;
+}
+
 std::uint8_t Compiler::parseVariable(const char *errorMessage) {
     consume(TokenType::Identifier, errorMessage);
+    declareVariable();
+    if (variables.scopeDepth > 0) {
+        return 0;
+    }
     return identifierConstant(parser.previous);
 }
 
@@ -94,6 +133,9 @@ std::uint8_t Compiler::identifierConstant(const Token& name) {
 }
 
 void Compiler::defineVariable(std::uint8_t global) {
+    if (variables.scopeDepth > 0) {
+        return;
+    }
     emitBytes(OpCode::DefineGlobal, global);
 }
 
@@ -304,15 +346,15 @@ void Compiler::synchronize() {
     }
 }
 
+void Compiler::beginScope() {
+    variables.scopeDepth++;
+}
 
+void Compiler::endScope() {
+    variables.scopeDepth--;
 
-
-
-
-
-
-
-
-
-
-
+    while (variables.localCount > 0 && variables.locals[static_cast<std::size_t>(variables.localCount - 1)].depth > variables.scopeDepth) {
+        emitByte(OpCode::Pop);
+        variables.localCount--;
+    }
+}
