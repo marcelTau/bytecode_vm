@@ -11,6 +11,9 @@ static int repl() {
     fmt::print("> ");
     std::string line;
     while (std::getline(std::cin, line)) {
+        if (line == "exit" || line == "quit") {
+            return 0;
+        }
         std::ignore = vm.interpret(line);
         fmt::print("> ");
     }
