@@ -40,7 +40,6 @@ concept IsOpcode = std::is_same_v<opcode, std::uint8_t> || std::is_same_v<opcode
 #define BIND(func_name) std::bind(&Compiler::func_name, this, std::placeholders::_1)
 
 struct Compiler {
-
     Compiler(Chunk& chunk) : chunk(chunk) {
         TokenTypeFunction = {
            /*TOKEN_LEFT_PAREN */   ParseRule {.prefix { BIND(grouping) }, .infix { nullptr }, .precedence {   Precedence::None} },
@@ -141,6 +140,15 @@ private:
     void synchronize();
 
 private:
+    struct Local {
+        Token name;
+        int depth;
+    };
+    struct Variables {
+        std::array<Local, UINT8_MAX + 1> locals;
+        int localCount { 0 };
+        int scopeDepth { 0 };
+    } varaibles;
     std::array<ParseRule, 40> TokenTypeFunction;
     Scanner scanner;
     Parser parser;
