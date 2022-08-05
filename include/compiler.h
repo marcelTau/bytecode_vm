@@ -91,9 +91,16 @@ private:
     void advance();
     void consume(TokenType type, const char *msg);
     void expression();
+    void declaration();
+    void statement();
+
+    void printStatement();
 
     void parsePrecedence(Precedence precedence);
-    [[nodiscard]] ParseRule getRule(TokenType);
+    [[nodiscard]] ParseRule getRule(TokenType type);
+    [[nodiscard]] bool match(TokenType type);
+    [[nodiscard]] bool check(TokenType type);
+
     void number();
     void grouping();
     void unary();

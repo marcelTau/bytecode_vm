@@ -10,18 +10,36 @@ bool Compiler::compile(const std::string_view source) {
     parser.hadError = false;
 
     advance();
-    expression();
-    consume(TokenType::Eof, "Expect end of expression.");
+
+    while (not match(TokenType::Eof)) {
+        declaration();
+    }
 
     // @todo this is endCompiler()
     emitReturn();
 #ifdef DEBUG_PRINT_CODE
-    if (not parser.hadError) {
-        chunk.disassembleChunk("code");
-    }
+if (not parser.hadError) {
+    chunk.disassembleChunk("code");
+}
 #endif
 
     return not parser.hadError;
+}
+
+void Compiler::declaration() {
+    statement();
+}
+
+void Compiler::statement() {
+    if (match(TokenType::Print)) {
+        printStatement();
+    }
+}
+
+void Compiler::printStatement() {
+    expression();
+    consume(TokenType::Semicolon, "Expect ';' after value.");
+    emitByte(OpCode::Print);
 }
 
 void Compiler::advance() {
@@ -121,6 +139,18 @@ void Compiler::parsePrecedence(Precedence precedence) {
 
 ParseRule Compiler::getRule(TokenType type) {
     return TokenTypeFunction[static_cast<std::uint8_t>(type)];
+}
+
+bool Compiler::check(TokenType type) {
+    return parser.current.type == type;
+}
+
+bool Compiler::match(TokenType type) {
+    if (not check(type)) {
+        return false;
+    }
+    advance();
+    return true;
 }
 
 void Compiler::consume(TokenType type, const char *msg) {

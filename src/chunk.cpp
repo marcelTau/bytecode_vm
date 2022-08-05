@@ -43,6 +43,7 @@ std::size_t Chunk::disassembleInstruction(std::size_t offset) const {
         case OpCode::Divide: return simpleInstruction("Divide", offset);
         case OpCode::Not: return simpleInstruction("Not", offset);
         case OpCode::Negate: return simpleInstruction("Negate", offset);
+        case OpCode::Print: return simpleInstruction("Print", offset);
         case OpCode::Return: return simpleInstruction("Return", offset);
         default:
             fmt::print("Unknown opcode {}\n", instruction);

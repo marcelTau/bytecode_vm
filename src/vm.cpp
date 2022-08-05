@@ -76,9 +76,11 @@ InterpretResult VM::run() {
                 m_stack.push(-value);
                 break;
             };
+            case OpCode::Print: {
+                fmt::print("{}\n", std::visit(PrintVisitor{}, pop()));
+                break;
+            };
             case OpCode::Return: {
-                fmt::print("{}\n", std::visit(PrintVisitor{}, m_stack.top()));
-                m_stack.pop();
                 return InterpretResult::Ok;
             }
         }
