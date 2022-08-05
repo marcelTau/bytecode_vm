@@ -1,5 +1,6 @@
 #include "vm.h"
 
+
 InterpretResult VM::interpret(const std::string_view source) {
     Chunk chunk;
 
@@ -21,7 +22,7 @@ InterpretResult VM::run() {
 #ifdef DEBUG_TRACE_EXECUTION
         const auto distance = std::distance(m_chunk->code.cbegin(), m_ip);
         fmt::print("          ");
-        for (auto dump = stack; not dump.empty(); dump.pop()) {
+        for (auto dump = m_stack; not dump.empty(); dump.pop()) {
             fmt::print("[ {} ]", std::visit(PrintVisitor{}, dump.top()));
         }
         fmt::print("\n");
@@ -31,7 +32,7 @@ InterpretResult VM::run() {
         switch (instruction = readByte()) {
             case OpCode::Constant: {
                 auto constant = readConstant();
-                stack.push(constant);
+                m_stack.push(constant);
                 break;
             }
             case OpCode::Add: { BINARY_OP(+); break; }
@@ -39,21 +40,34 @@ InterpretResult VM::run() {
             case OpCode::Multiply: { BINARY_OP(*); break; }
             case OpCode::Divide: { BINARY_OP(/); break; }
             case OpCode::Negate: {
-                const auto last = stack.top();
+                const auto last = m_stack.top();
                 if (not std::holds_alternative<Number>(last)) {
                     fmt::print(stderr, "Operand must be a number.");
                     return InterpretResult::RuntimeError;
                 }
                 const auto value = std::get<Number>(last);
-                stack.pop();
-                stack.push(-value);
+                m_stack.pop();
+                m_stack.push(-value);
                 break;
             }
             case OpCode::Return: {
-                fmt::print("{}\n", std::visit(PrintVisitor{}, stack.top()));
-                stack.pop();
+                fmt::print("{}\n", std::visit(PrintVisitor{}, m_stack.top()));
+                m_stack.pop();
                 return InterpretResult::Ok;
             }
         }
     }
+}
+
+void VM::runtimeError(const char *msg) {
+    fmt::print(stderr, "{}", msg);
+
+    long instruction = std::distance(this->m_chunk->code.cbegin(), this->m_ip) - 1;
+    std::size_t line = this->m_chunk->lines[static_cast<std::size_t>(instruction)];
+    fmt::print(stderr, "[line {}] in script\n", line);
+    resetStack();
+}
+
+void VM::resetStack() {
+    m_stack = {};
 }
