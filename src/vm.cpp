@@ -40,6 +40,16 @@ InterpretResult VM::run() {
             case OpCode::True: { m_stack.emplace_back(true); break; };
             case OpCode::False: { m_stack.emplace_back(false); break; };
             case OpCode::Pop: { std::ignore = pop(); break; };
+            case OpCode::GetLocal: {
+                auto slot = readByte();
+                m_stack.push_back(m_stack[static_cast<std::size_t>(slot)]);
+                break;
+            };
+            case OpCode::SetLocal: {
+                auto slot = readByte();
+                m_stack[static_cast<std::size_t>(slot)] = peek();
+                break;
+            };
             case OpCode::GetGlobal: {
                 const auto name = get_objtype_unchecked<std::string>(readConstant());
                 Value value;

@@ -8,6 +8,8 @@ enum class OpCode : std::uint8_t {
     True,
     False,
     Pop,
+    GetLocal,
+    SetLocal,
     GetGlobal,
     DefineGlobal,
     SetGlobal,

@@ -120,6 +120,7 @@ private:
     void string(bool);
     void variable(bool canAssign);
     void namedVariable(const Token& name, bool canAssign);
+    void markInitialized();
     [[nodiscard]] int resolveLocal(const Token& name);
 
     template<typename opcode>

@@ -116,7 +116,7 @@ void Compiler::addLocal(const Token& name) {
     }
     Local& local = variables.locals[static_cast<std::size_t>(variables.localCount++)];
     local.name = name;
-    local.depth = variables.scopeDepth;
+    local.depth = -1;
 }
 
 std::uint8_t Compiler::parseVariable(const char *errorMessage) {
@@ -134,9 +134,14 @@ std::uint8_t Compiler::identifierConstant(const Token& name) {
 
 void Compiler::defineVariable(std::uint8_t global) {
     if (variables.scopeDepth > 0) {
+        markInitialized();
         return;
     }
     emitBytes(OpCode::DefineGlobal, global);
+}
+
+void Compiler::markInitialized() {
+    variables.locals[static_cast<std::size_t>(variables.localCount - 1)].depth = variables.scopeDepth;
 }
 
 void Compiler::advance() {
@@ -225,11 +230,11 @@ void Compiler::namedVariable(const Token& name, bool canAssign) {
 
     if (arg != -1) {
         getOp = OpCode::GetLocal;
-        getOp = OpCode::SetLocal;
+        setOp = OpCode::SetLocal;
     } else {
         arg = identifierConstant(name);
         getOp = OpCode::GetGlobal;
-        getOp = OpCode::SetGlobal;
+        setOp = OpCode::SetGlobal;
     }
 
     if (canAssign && match(TokenType::Equal)) {
@@ -244,6 +249,9 @@ int Compiler::resolveLocal(const Token& name) {
     for (int i = variables.localCount - 1; i >= 0; --i) {
         Local& local = variables.locals[static_cast<std::size_t>(i)];
         if (identifiersEqual(name, local.name)) {
+            if (local.depth == -1) {
+                error("Can't read local variable in its own initalizer.");
+            }
             return i;
         }
     }

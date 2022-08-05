@@ -35,6 +35,8 @@ std::size_t Chunk::disassembleInstruction(std::size_t offset) const {
         case OpCode::True: return simpleInstruction("True", offset);
         case OpCode::False: return simpleInstruction("False", offset);
         case OpCode::Pop: return simpleInstruction("Pop", offset);
+        case OpCode::GetLocal: return byteInstruction("GetLocal", offset);
+        case OpCode::SetLocal: return byteInstruction("SetLocal", offset);
         case OpCode::GetGlobal: return constantInstruction("GetGlobal", offset);
         case OpCode::DefineGlobal: return constantInstruction("DefineGlobal", offset);
         case OpCode::SetGlobal: return constantInstruction("SetGlobal", offset);
@@ -69,5 +71,12 @@ std::size_t Chunk::constantInstruction(const std::string_view name, std::size_t 
     std::uint8_t constant = code[offset + 1];
     auto variant = constants[constant];
     fmt::print("{:16} {:4d} '{}'\n", name, constant, std::visit(PrintVisitor{}, variant));
+    return offset + 2;
+}
+
+
+std::size_t Chunk::byteInstruction(const std::string_view name, std::size_t offset) const {
+    std::uint8_t slot = code[offset + 1];
+    fmt::print("{:16} {:4d}\n", name, slot);
     return offset + 2;
 }
