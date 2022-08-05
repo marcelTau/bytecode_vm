@@ -23,8 +23,8 @@ InterpretResult VM::run() {
 #ifdef DEBUG_TRACE_EXECUTION
         const auto distance = std::distance(m_chunk->code.cbegin(), m_ip);
         fmt::print("          ");
-        for (auto dump = m_stack; not dump.empty(); dump.pop()) {
-            fmt::print("[ {} ]", std::visit(PrintVisitor{}, dump.top()));
+        for (auto dump = m_stack; not dump.empty(); dump.pop_back()) {
+            fmt::print("[ {} ]", std::visit(PrintVisitor{}, dump.back()));
         }
         fmt::print("\n");
         std::ignore = m_chunk->disassembleInstruction(static_cast<std::size_t>(distance));
@@ -33,12 +33,12 @@ InterpretResult VM::run() {
         switch (instruction = readByte()) {
             case OpCode::Constant: {
                 auto constant = readConstant();
-                m_stack.push(constant);
+                m_stack.push_back(constant);
                 break;
             }
-            case OpCode::Nil: { m_stack.push(Nil{}); break; };
-            case OpCode::True: { m_stack.push(true); break; };
-            case OpCode::False: { m_stack.push(false); break; };
+            case OpCode::Nil: { m_stack.emplace_back(Nil{}); break; };
+            case OpCode::True: { m_stack.emplace_back(true); break; };
+            case OpCode::False: { m_stack.emplace_back(false); break; };
             case OpCode::Pop: { std::ignore = pop(); break; };
             case OpCode::GetGlobal: {
                 const auto name = get_objtype_unchecked<std::string>(readConstant());
@@ -49,7 +49,7 @@ InterpretResult VM::run() {
                     runtimeError(fmt::format("Undefined variable '{}'", name));
                     return InterpretResult::RuntimeError;
                 }
-                m_stack.push(value);
+                m_stack.push_back(value);
                 break;
             };
             case OpCode::DefineGlobal: {
@@ -74,7 +74,7 @@ InterpretResult VM::run() {
             case OpCode::Equal: {
                 const auto b = pop();
                 const auto a = pop();
-                m_stack.push(valuesEqual(a, b));
+                m_stack.emplace_back(valuesEqual(a, b));
                 break;
             };
             case OpCode::Greater: { BINARY_OP(>); break; };
@@ -91,21 +91,21 @@ InterpretResult VM::run() {
             case OpCode::Multiply: { BINARY_OP(*); break; }
             case OpCode::Divide: { BINARY_OP(/); break; }
             case OpCode::Not: {
-                const auto value = m_stack.top();
-                m_stack.pop();
+                const auto value = m_stack.back();
+                m_stack.pop_back();
                 const bool truthyness = isFalsey(value);
-                m_stack.push(truthyness);
+                m_stack.emplace_back(truthyness);
                 break;
             };
             case OpCode::Negate: {
-                const auto last = m_stack.top();
+                const auto last = m_stack.back();
                 if (not std::holds_alternative<Number>(last)) {
                     fmt::print(stderr, "Operand must be a number.");
                     return InterpretResult::RuntimeError;
                 }
                 const auto value = std::get<Number>(last);
-                m_stack.pop();
-                m_stack.push(-value);
+                m_stack.pop_back();
+                m_stack.emplace_back(-value);
                 break;
             };
             case OpCode::Print: {
@@ -136,7 +136,7 @@ void VM::concatenate() {
     // unchecked should be fine, since we're checking the types before in run()
     auto b = get_objtype_unchecked<std::string>(pop());
     auto a = get_objtype_unchecked<std::string>(pop());
-    m_stack.push(a + b);
+    m_stack.emplace_back(a + b);
 }
 
 bool VM::isFalsey(const Value& value) {
@@ -152,19 +152,19 @@ bool VM::valuesEqual(const Value& a, const Value& b) {
 
 Value VM::peek(std::size_t many) {
     if (many == 0) {
-        return m_stack.top();
+        return m_stack.back();
     } else if (many == 1) {
         auto tmpValue = pop();
-        auto retValue = m_stack.top();
-        m_stack.push(tmpValue);
+        auto retValue = m_stack.back();
+        m_stack.push_back(tmpValue);
         return retValue;
     }
     assert(false && "peek is not implemented for numbers > 1.");
 }
 
 Value VM::pop() {
-    auto v = m_stack.top();
-    m_stack.pop();
+    auto v = m_stack.back();
+    m_stack.pop_back();
     return v;
 }
 

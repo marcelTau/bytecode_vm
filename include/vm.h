@@ -16,22 +16,22 @@ enum class InterpretResult : std::uint8_t {
 // we have to push b in the error case since we can't peek the stack beforehand
 #define BINARY_OP(op) \
     do { \
-      auto b = m_stack.top(); \
+      auto b = m_stack.back(); \
       if (not std::holds_alternative<Number>(b)) { \
         runtimeError("Operands must be numbers."); \
         return InterpretResult::RuntimeError; \
       }\
-      m_stack.pop(); \
-      auto a = m_stack.top(); \
+      m_stack.pop_back(); \
+      auto a = m_stack.back(); \
       if (not std::holds_alternative<Number>(a)) {\
         runtimeError("Operands must be numbers."); \
-        m_stack.push(b); \
+        m_stack.emplace_back(b); \
         return InterpretResult::RuntimeError; \
       }\
-      m_stack.pop(); \
+      m_stack.pop_back(); \
       const auto a_value = std::get<Number>(a);\
       const auto b_value = std::get<Number>(b);\
-      m_stack.push(a_value op b_value); \
+      m_stack.emplace_back(a_value op b_value); \
     } while (false)
 
 class VM {
@@ -51,6 +51,6 @@ private:
 private:
     std::unique_ptr<Chunk> m_chunk;
     std::vector<std::uint8_t>::const_iterator m_ip;
-    std::stack<Value> m_stack;
+    std::vector<Value> m_stack;
     std::unordered_map<std::string, Value> globals;
 };
