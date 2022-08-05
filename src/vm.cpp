@@ -39,6 +39,7 @@ InterpretResult VM::run() {
             case OpCode::Nil: { m_stack.push(Nil{}); break; };
             case OpCode::True: { m_stack.push(true); break; };
             case OpCode::False: { m_stack.push(false); break; };
+            case OpCode::Pop: { std::ignore = pop(); break; };
             case OpCode::Equal: {
                 const auto b = pop();
                 const auto a = pop();

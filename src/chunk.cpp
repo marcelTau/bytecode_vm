@@ -34,6 +34,7 @@ std::size_t Chunk::disassembleInstruction(std::size_t offset) const {
         case OpCode::Nil: return simpleInstruction("Nil", offset);
         case OpCode::True: return simpleInstruction("True", offset);
         case OpCode::False: return simpleInstruction("False", offset);
+        case OpCode::Pop: return simpleInstruction("Pop", offset);
         case OpCode::Equal: return simpleInstruction("Equal", offset);
         case OpCode::Greater: return simpleInstruction("Greater", offset);
         case OpCode::Less: return simpleInstruction("Less", offset);

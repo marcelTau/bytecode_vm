@@ -95,6 +95,7 @@ private:
     void statement();
 
     void printStatement();
+    void expressionStatement();
 
     void parsePrecedence(Precedence precedence);
     [[nodiscard]] ParseRule getRule(TokenType type);
