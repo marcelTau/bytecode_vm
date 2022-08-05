@@ -35,7 +35,7 @@ coverage: build test
 
 
 run: build
-	./$(build_dir)/$(exe_name)
+	./$(build_dir)/$(exe_name)-debug
 
 frun: build
 	./$(build_dir)/$(exe_name) test.lox
