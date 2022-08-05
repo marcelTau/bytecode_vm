@@ -92,6 +92,7 @@ private:
     void expression();
     void declaration();
     void statement();
+    void block();
 
     void printStatement();
     void expressionStatement();
@@ -148,7 +149,10 @@ private:
         std::array<Local, UINT8_MAX + 1> locals;
         int localCount { 0 };
         int scopeDepth { 0 };
-    } varaibles;
+
+        void beginScope() { scopeDepth++; }
+        void endScope() { scopeDepth--; }
+    } variables;
     std::array<ParseRule, 40> TokenTypeFunction;
     Scanner scanner;
     Parser parser;

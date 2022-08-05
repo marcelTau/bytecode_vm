@@ -41,9 +41,21 @@ void Compiler::declaration() {
 void Compiler::statement() {
     if (match(TokenType::Print)) {
         printStatement();
+    } else if (match(TokenType::LeftBrace)) {
+        variables.beginScope();
+        block();
+        variables.endScope();
     } else {
         expressionStatement();
     }
+}
+
+void Compiler::block() {
+    while (not check(TokenType::RightBrace) && not check(TokenType::Eof)) {
+        declaration();
+    }
+
+    consume(TokenType::RightBrace, "Expect '}' after block.");
 }
 
 void Compiler::printStatement() {
