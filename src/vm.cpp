@@ -42,6 +42,13 @@ InterpretResult VM::run() {
             case OpCode::Subtract: { BINARY_OP(-); break; }
             case OpCode::Multiply: { BINARY_OP(*); break; }
             case OpCode::Divide: { BINARY_OP(/); break; }
+            case OpCode::Not: {
+                 const auto value = m_stack.top();
+                 m_stack.pop();
+                 const bool truthyness = isFalsey(value);
+                 m_stack.push(truthyness);
+                 break;
+            }
             case OpCode::Negate: {
                 const auto last = m_stack.top();
                 if (not std::holds_alternative<Number>(last)) {
@@ -73,4 +80,12 @@ void VM::runtimeError(const char *msg) {
 
 void VM::resetStack() {
     m_stack = {};
+}
+
+
+bool VM::isFalsey(const Value& value) {
+    return (
+        std::holds_alternative<Nil>(value) ||
+        (std::holds_alternative<bool>(value) && std::get<bool>(value) == false)
+    );
 }

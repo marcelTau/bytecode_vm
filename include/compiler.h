@@ -54,7 +54,7 @@ struct Compiler {
            /*TOKEN_SEMICOLON */    ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_SLASH */        ParseRule {.prefix { nullptr }, .infix { BIND(binary) }, .precedence { Precedence::Factor} },
            /*TOKEN_STAR */         ParseRule {.prefix { nullptr }, .infix { BIND(binary) }, .precedence { Precedence::Factor} },
-           /*TOKEN_BANG */         ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
+           /*TOKEN_BANG */         ParseRule {.prefix { BIND(unary) }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_BANG_EQUAL */   ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_EQUAL */        ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_EQUAL_EQUAL */  ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },

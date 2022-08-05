@@ -38,6 +38,7 @@ std::size_t Chunk::disassembleInstruction(std::size_t offset) const {
         case OpCode::Subtract: return simpleInstruction("Subtract", offset);
         case OpCode::Multiply: return simpleInstruction("Multiply", offset);
         case OpCode::Divide: return simpleInstruction("Divide", offset);
+        case OpCode::Not: return simpleInstruction("Not", offset);
         case OpCode::Negate: return simpleInstruction("Negate", offset);
         case OpCode::Return: return simpleInstruction("Return", offset);
         default:

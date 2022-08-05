@@ -11,6 +11,7 @@ enum class OpCode : std::uint8_t {
     Subtract,
     Multiply,
     Divide,
+    Not,
     Negate,
     Return,
 };

@@ -41,6 +41,7 @@ private:
     void runtimeError(const char *msg);
     [[nodiscard]] InterpretResult run();
     void resetStack(); 
+    [[nodiscard]] bool isFalsey(const Value& value);
 
 private:
     std::unique_ptr<Chunk> m_chunk;

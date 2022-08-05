@@ -58,6 +58,7 @@ void Compiler::unary() {
 
     switch (operatorType) {
         case TokenType::Minus: return emitByte(OpCode::Negate);
+        case TokenType::Bang: return emitByte(OpCode::Not);
         default: assert(false && "Unreachable TokenType in unary expression.");
     }
 }
@@ -84,7 +85,7 @@ void Compiler::literal() {
         case TokenType::False: return emitByte(OpCode::False);
         case TokenType::Nil: return emitByte(OpCode::Nil);
         case TokenType::True: return emitByte(OpCode::True);
-        default: assert(false && "Unreachable");
+        default: assert(false && "Unreachable TokenType in literal expression.");
     }
 }
 
