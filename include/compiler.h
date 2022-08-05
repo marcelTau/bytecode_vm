@@ -62,7 +62,7 @@ struct Compiler {
            /*TOKEN_GREATER_EQUAL */ParseRule {.prefix { nullptr }, .infix { BIND(binary) }, .precedence { Precedence::Comparison} },
            /*TOKEN_LESS */         ParseRule {.prefix { nullptr }, .infix { BIND(binary) }, .precedence { Precedence::Comparison} },
            /*TOKEN_LESS_EQUAL */   ParseRule {.prefix { nullptr }, .infix { BIND(binary) }, .precedence { Precedence::Comparison} },
-           /*TOKEN_IDENTIFIER */   ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
+           /*TOKEN_IDENTIFIER */   ParseRule {.prefix { BIND(variable) }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_STRING */       ParseRule {.prefix { BIND(string) }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_NUMBER */       ParseRule {.prefix { BIND(number) }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_AND */          ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
@@ -114,6 +114,8 @@ private:
     void binary();
     void literal();
     void string();
+    void variable();
+    void namedVariable(const Token& name);
 
     template<typename opcode>
     requires IsOpcode<opcode>

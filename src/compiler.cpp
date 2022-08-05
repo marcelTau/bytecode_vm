@@ -161,6 +161,15 @@ void Compiler::string() {
     emitConstant(s);
 }
 
+void Compiler::variable() {
+    namedVariable(parser.previous);
+}
+
+void Compiler::namedVariable(const Token& name) {
+    std::uint8_t arg = identifierConstant(name);
+    emitBytes(OpCode::GetGlobal, arg);
+}
+
 void Compiler::parsePrecedence(Precedence precedence) {
     advance();
 

@@ -40,6 +40,18 @@ InterpretResult VM::run() {
             case OpCode::True: { m_stack.push(true); break; };
             case OpCode::False: { m_stack.push(false); break; };
             case OpCode::Pop: { std::ignore = pop(); break; };
+            case OpCode::GetGlobal: {
+                const auto name = get_objtype_unchecked<std::string>(readConstant());
+                Value value;
+                try {
+                    value = globals.at(name);
+                } catch (const std::exception&) {
+                    runtimeError(fmt::format("Undefined variable '{}'", name));
+                    return InterpretResult::RuntimeError;
+                }
+                m_stack.push(value);
+                break;
+            };
             case OpCode::DefineGlobal: {
                 const auto name = get_objtype_unchecked<std::string>(readConstant());
                 globals[name] = peek();
@@ -94,7 +106,7 @@ InterpretResult VM::run() {
     }
 }
 
-void VM::runtimeError(const char *msg) {
+void VM::runtimeError(const std::string& msg) {
     fmt::print(stderr, "{}", msg);
 
     long instruction = std::distance(this->m_chunk->code.cbegin(), this->m_ip) - 1;

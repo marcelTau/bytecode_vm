@@ -39,7 +39,7 @@ public:
     VM() = default;
     [[nodiscard]] InterpretResult interpret(const std::string_view source);
 private:
-    void runtimeError(const char *msg);
+    void runtimeError(const std::string& msg);
     void resetStack(); 
     void concatenate();
     [[nodiscard]] InterpretResult run();

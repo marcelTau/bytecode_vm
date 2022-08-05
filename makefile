@@ -38,7 +38,7 @@ run: build
 	./$(build_dir)/$(exe_name)-debug
 
 frun: build
-	./$(build_dir)/$(exe_name) test.lox
+	./$(build_dir)/$(exe_name)-debug test.lox
 clean:
 	make clean -C build
 
