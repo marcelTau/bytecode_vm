@@ -5,6 +5,7 @@
 #include "compiler.h"
 #include <memory>
 #include <stack>
+#include <unordered_map>
 
 enum class InterpretResult : std::uint8_t {
     Ok,
@@ -51,4 +52,5 @@ private:
     std::unique_ptr<Chunk> m_chunk;
     std::vector<std::uint8_t>::const_iterator m_ip;
     std::stack<Value> m_stack;
+    std::unordered_map<std::string, Value> globals;
 };

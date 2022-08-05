@@ -40,6 +40,12 @@ InterpretResult VM::run() {
             case OpCode::True: { m_stack.push(true); break; };
             case OpCode::False: { m_stack.push(false); break; };
             case OpCode::Pop: { std::ignore = pop(); break; };
+            case OpCode::DefineGlobal: {
+                const auto name = get_objtype_unchecked<std::string>(readConstant());
+                globals[name] = peek();
+                std::ignore = pop();
+                break;
+            };
             case OpCode::Equal: {
                 const auto b = pop();
                 const auto a = pop();

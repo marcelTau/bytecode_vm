@@ -96,8 +96,14 @@ private:
 
     void printStatement();
     void expressionStatement();
+    void varDeclaration();
 
     void parsePrecedence(Precedence precedence);
+
+    [[nodiscard]] std::uint8_t parseVariable(const char *errorMessage);
+    [[nodiscard]] std::uint8_t identifierConstant(const Token& name);
+    void defineVariable(std::uint8_t global);
+
     [[nodiscard]] ParseRule getRule(TokenType type);
     [[nodiscard]] bool match(TokenType type);
     [[nodiscard]] bool check(TokenType type);

@@ -27,7 +27,11 @@ if (not parser.hadError) {
 }
 
 void Compiler::declaration() {
-    statement();
+    if (match(TokenType::Var)) {
+        varDeclaration();
+    } else {
+        statement();
+    }
 
     if (parser.panicMode) {
         synchronize();
@@ -52,6 +56,33 @@ void Compiler::expressionStatement() {
     expression();
     consume(TokenType::Semicolon, "Expect ';' after expression.");
     emitByte(OpCode::Pop);
+}
+
+void Compiler::varDeclaration() {
+    std::uint8_t global = parseVariable("Expect variable name.");
+
+    if (match(TokenType::Equal)) {
+        expression();
+    } else {
+        emitByte(OpCode::Nil);
+    }
+
+    consume(TokenType::Semicolon, "Expect ';' after variable declaration.");
+
+    defineVariable(global);
+}
+
+std::uint8_t Compiler::parseVariable(const char *errorMessage) {
+    consume(TokenType::Identifier, errorMessage);
+    return identifierConstant(parser.previous);
+}
+
+std::uint8_t Compiler::identifierConstant(const Token& name) {
+    return makeConstant(std::string(name.start, name.length));
+}
+
+void Compiler::defineVariable(std::uint8_t global) {
+    emitBytes(OpCode::DefineGlobal, global);
 }
 
 void Compiler::advance() {
