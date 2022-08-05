@@ -19,6 +19,7 @@ using Value = std::variant<bool, Number, Nil>;
 struct PrintVisitor {
     // The Nil (std::monostate) variant cannot be formatted by fmt::format by default, so we can catch it here.
     std::string operator()(Nil) { return "Nil"; }
+    std::string operator()(bool b) { return b ? "true" : "false"; }
 
     // This matches every other type than std::monostate. 
     std::string operator()(const auto& x) { return fmt::format("{}", x); }

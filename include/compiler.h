@@ -37,21 +37,23 @@ struct Parser {
 template <typename opcode>
 concept IsOpcode = std::is_same_v<opcode, std::uint8_t> || std::is_same_v<opcode, OpCode>;
 
+#define BIND(func_name) std::bind(&Compiler::func_name, this)
+
 struct Compiler {
 
     Compiler(Chunk& chunk) : chunk(chunk) {
         TokenTypeFunction = {
-           /*TOKEN_LEFT_PAREN */   ParseRule {.prefix { std::bind(&Compiler::grouping, this) }, .infix { nullptr }, .precedence {   Precedence::None} },
+           /*TOKEN_LEFT_PAREN */   ParseRule {.prefix { BIND(grouping) }, .infix { nullptr }, .precedence {   Precedence::None} },
            /*TOKEN_RIGHT_PAREN */  ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_LEFT_BRACE */   ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} }, 
            /*TOKEN_RIGHT_BRACE */  ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_COMMA */        ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_DOT */          ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
-           /*TOKEN_MINUS */        ParseRule {.prefix { std::bind(&Compiler::unary, this) }, .infix { std::bind(&Compiler::binary, this) }, .precedence { Precedence::Term} },
-           /*TOKEN_PLUS */         ParseRule {.prefix { nullptr }, .infix { std::bind(&Compiler::binary, this) }, .precedence { Precedence::Term} },
+           /*TOKEN_MINUS */        ParseRule {.prefix { BIND(unary) }, .infix { BIND(binary) }, .precedence { Precedence::Term} },
+           /*TOKEN_PLUS */         ParseRule {.prefix { nullptr }, .infix { BIND(binary) }, .precedence { Precedence::Term} },
            /*TOKEN_SEMICOLON */    ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
-           /*TOKEN_SLASH */        ParseRule {.prefix { nullptr }, .infix { std::bind(&Compiler::binary, this) }, .precedence { Precedence::Factor} },
-           /*TOKEN_STAR */         ParseRule {.prefix { nullptr }, .infix { std::bind(&Compiler::binary, this) }, .precedence { Precedence::Factor} },
+           /*TOKEN_SLASH */        ParseRule {.prefix { nullptr }, .infix { BIND(binary) }, .precedence { Precedence::Factor} },
+           /*TOKEN_STAR */         ParseRule {.prefix { nullptr }, .infix { BIND(binary) }, .precedence { Precedence::Factor} },
            /*TOKEN_BANG */         ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_BANG_EQUAL */   ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_EQUAL */        ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
@@ -62,21 +64,21 @@ struct Compiler {
            /*TOKEN_LESS_EQUAL */   ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_IDENTIFIER */   ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_STRING */       ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
-           /*TOKEN_NUMBER */       ParseRule {.prefix { std::bind(&Compiler::number, this) }, .infix { nullptr }, .precedence { Precedence::None} },
+           /*TOKEN_NUMBER */       ParseRule {.prefix { BIND(number) }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_AND */          ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_CLASS */        ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_ELSE */         ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
-           /*TOKEN_FALSE */        ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
+           /*TOKEN_FALSE */        ParseRule {.prefix { BIND(literal) }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_FOR */          ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_FUN */          ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_IF */           ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
-           /*TOKEN_NIL */          ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
+           /*TOKEN_NIL */          ParseRule {.prefix { BIND(literal) }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_OR */           ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_PRINT */        ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_RETURN */       ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_SUPER */        ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_THIS */         ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
-           /*TOKEN_TRUE */         ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
+           /*TOKEN_TRUE */         ParseRule {.prefix { BIND(literal) }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_VAR */          ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_WHILE */        ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_ERROR */        ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
@@ -96,6 +98,7 @@ private:
     void grouping();
     void unary();
     void binary();
+    void literal();
 
     template<typename opcode>
     requires IsOpcode<opcode>

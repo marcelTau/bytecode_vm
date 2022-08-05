@@ -17,13 +17,13 @@ enum class InterpretResult : std::uint8_t {
     do { \
       auto b = m_stack.top(); \
       if (not std::holds_alternative<Number>(b)) { \
-        fmt::print(stderr, "todo make this a runtime_error ..."); \
+        runtimeError("Operands must be numbers."); \
         return InterpretResult::RuntimeError; \
       }\
       m_stack.pop(); \
       auto a = m_stack.top(); \
       if (not std::holds_alternative<Number>(a)) {\
-        fmt::print(stderr, "todo make this a runtime_error aswell ...");\
+        runtimeError("Operands must be numbers."); \
         m_stack.push(b); \
         return InterpretResult::RuntimeError; \
       }\

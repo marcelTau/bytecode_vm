@@ -35,6 +35,9 @@ InterpretResult VM::run() {
                 m_stack.push(constant);
                 break;
             }
+            case OpCode::Nil: m_stack.push(Nil{}); break;
+            case OpCode::True: m_stack.push(true); break;
+            case OpCode::False: m_stack.push(false); break;
             case OpCode::Add: { BINARY_OP(+); break; }
             case OpCode::Subtract: { BINARY_OP(-); break; }
             case OpCode::Multiply: { BINARY_OP(*); break; }

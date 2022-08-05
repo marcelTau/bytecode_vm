@@ -84,6 +84,15 @@ void Compiler::binary() {
     }
 }
 
+void Compiler::literal() {
+    switch (parser.previous.type) {
+        case TokenType::False: return emitByte(OpCode::False);
+        case TokenType::Nil: return emitByte(OpCode::Nil);
+        case TokenType::True: return emitByte(OpCode::True);
+        default: assert(false && "Unreachable");
+    }
+}
+
 void Compiler::parsePrecedence(Precedence precedence) {
     advance();
 

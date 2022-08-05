@@ -4,6 +4,9 @@
 
 enum class OpCode : std::uint8_t {
     Constant,
+    Nil,
+    True,
+    False,
     Add,
     Subtract,
     Multiply,
