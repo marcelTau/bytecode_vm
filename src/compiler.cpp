@@ -220,14 +220,34 @@ void Compiler::variable(bool canAssign) {
 }
 
 void Compiler::namedVariable(const Token& name, bool canAssign) {
-    std::uint8_t arg = identifierConstant(name);
+    OpCode getOp, setOp;
+    int arg = resolveLocal(name);
+
+    if (arg != -1) {
+        getOp = OpCode::GetLocal;
+        getOp = OpCode::SetLocal;
+    } else {
+        arg = identifierConstant(name);
+        getOp = OpCode::GetGlobal;
+        getOp = OpCode::SetGlobal;
+    }
 
     if (canAssign && match(TokenType::Equal)) {
         expression();
-        emitBytes(OpCode::SetGlobal, arg);
+        emitBytes(setOp, static_cast<std::uint8_t>(arg));
     } else {
-        emitBytes(OpCode::GetGlobal, arg);
+        emitBytes(getOp, static_cast<std::uint8_t>(arg));
     }
+}
+
+int Compiler::resolveLocal(const Token& name) {
+    for (int i = variables.localCount - 1; i >= 0; --i) {
+        Local& local = variables.locals[static_cast<std::size_t>(i)];
+        if (identifiersEqual(name, local.name)) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 void Compiler::parsePrecedence(Precedence precedence) {
