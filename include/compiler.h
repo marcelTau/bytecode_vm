@@ -130,6 +130,7 @@ private:
     void errorAtCurrent(const char *msg);
     void error(const char *msg);
     void errorAt(Token& token, const char *msg);
+    void synchronize();
 
 private:
     std::array<ParseRule, 40> TokenTypeFunction;

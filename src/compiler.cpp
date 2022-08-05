@@ -28,6 +28,10 @@ if (not parser.hadError) {
 
 void Compiler::declaration() {
     statement();
+
+    if (parser.panicMode) {
+        synchronize();
+    }
 }
 
 void Compiler::statement() {
@@ -214,7 +218,28 @@ std::uint8_t Compiler::makeConstant(const Value& value) {
     return static_cast<std::uint8_t>(constant);
 }
 
+void Compiler::synchronize() {
+    parser.panicMode = false;
 
+    while (parser.current.type != TokenType::Eof) {
+        if (parser.previous.type == TokenType::Semicolon) {
+            return;
+        }
+        switch (parser.current.type) {
+            case TokenType::Class:
+            case TokenType::Fun:
+            case TokenType::Var:
+            case TokenType::For:
+            case TokenType::If:
+            case TokenType::While:
+            case TokenType::Print:
+            case TokenType::Return:
+                return;
+            default: /*nothing*/;
+        }
+        advance();
+    }
+}
 
 
 
