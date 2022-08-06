@@ -34,8 +34,12 @@ struct Parser {
     bool panicMode { false };
 };
 
+// user defined literals turns a ULL into u8
+inline constexpr std::uint8_t operator""_u8(unsigned long long arg) noexcept { return static_cast<std::uint8_t>(arg); }
+
 template <typename opcode>
 concept IsOpcode = std::is_same_v<opcode, std::uint8_t> || std::is_same_v<opcode, OpCode>;
+
 
 #define BIND(func_name) std::bind(&Compiler::func_name, this, std::placeholders::_1)
 
@@ -64,7 +68,7 @@ struct Compiler {
            /*TOKEN_IDENTIFIER */   ParseRule {.prefix { BIND(variable) }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_STRING */       ParseRule {.prefix { BIND(string) }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_NUMBER */       ParseRule {.prefix { BIND(number) }, .infix { nullptr }, .precedence { Precedence::None} },
-           /*TOKEN_AND */          ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
+           /*TOKEN_AND */          ParseRule {.prefix { nullptr }, .infix { BIND(and_) }, .precedence { Precedence::And} },
            /*TOKEN_CLASS */        ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_ELSE */         ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_FALSE */        ParseRule {.prefix { BIND(literal) }, .infix { nullptr }, .precedence { Precedence::None} },
@@ -72,7 +76,7 @@ struct Compiler {
            /*TOKEN_FUN */          ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_IF */           ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_NIL */          ParseRule {.prefix { BIND(literal) }, .infix { nullptr }, .precedence { Precedence::None} },
-           /*TOKEN_OR */           ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
+           /*TOKEN_OR */           ParseRule {.prefix { nullptr }, .infix { BIND(or_) }, .precedence { Precedence::Or} },
            /*TOKEN_PRINT */        ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_RETURN */       ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
            /*TOKEN_SUPER */        ParseRule {.prefix { nullptr }, .infix { nullptr }, .precedence { Precedence::None} },
@@ -124,6 +128,8 @@ private:
     void namedVariable(const Token& name, bool canAssign);
     void markInitialized();
     [[nodiscard]] int resolveLocal(const Token& name);
+    void and_(bool);
+    void or_(bool);
 
     template<typename opcode>
     requires IsOpcode<opcode>
@@ -142,9 +148,9 @@ private:
     requires IsOpcode<opcode>
     int emitJump(opcode instruction) {
         emitByte(instruction);
-        emitByte(0xff);
-        emitByte(0xff);
-        return chunk.code.size() - 2;
+        emitByte(0xff_u8);
+        emitByte(0xff_u8);
+        return static_cast<int>(chunk.code.size()) - 2;
     }
 
     void emitConstant(const Value& value);

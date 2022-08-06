@@ -279,6 +279,24 @@ int Compiler::resolveLocal(const Token& name) {
     return -1;
 }
 
+void Compiler::and_(bool) {
+    auto endJump = emitJump(OpCode::JumpIfFalse);
+    emitByte(OpCode::Pop);
+    parsePrecedence(Precedence::And);
+    patchJump(endJump);
+}
+
+void Compiler::or_(bool) {
+    auto elseJump = emitJump(OpCode::JumpIfFalse);
+    auto endJump = emitJump(OpCode::Jump);
+
+    patchJump(elseJump);
+    emitByte(OpCode::Pop);
+
+    parsePrecedence(Precedence::Or);
+    patchJump(endJump);
+}
+
 void Compiler::parsePrecedence(Precedence precedence) {
     advance();
 
