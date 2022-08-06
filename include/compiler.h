@@ -94,6 +94,7 @@ private:
     void statement();
     void block();
 
+    void ifStatement();
     void printStatement();
     void expressionStatement();
     void varDeclaration();
@@ -107,6 +108,7 @@ private:
     [[nodiscard]] std::uint8_t parseVariable(const char *errorMessage);
     [[nodiscard]] std::uint8_t identifierConstant(const Token& name);
     void defineVariable(std::uint8_t global);
+    void patchJump(int offset);
 
     [[nodiscard]] ParseRule getRule(TokenType type);
     [[nodiscard]] bool match(TokenType type);
@@ -134,6 +136,15 @@ private:
     void emitBytes(opcode byte1, opcode2 byte2) {
         emitByte(byte1);
         emitByte(byte2);
+    }
+
+    template<typename opcode>
+    requires IsOpcode<opcode>
+    int emitJump(opcode instruction) {
+        emitByte(instruction);
+        emitByte(0xff);
+        emitByte(0xff);
+        return chunk.code.size() - 2;
     }
 
     void emitConstant(const Value& value);

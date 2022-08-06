@@ -19,6 +19,10 @@ InterpretResult VM::interpret(const std::string_view source) {
 InterpretResult VM::run() {
     const auto readByte = [this]() -> OpCode { return static_cast<OpCode>(*m_ip++); };
     const auto readConstant = [this, readByte]() -> Value { return m_chunk->constants[static_cast<std::size_t>(readByte())]; };
+    const auto readShort = [this]() -> std::uint16_t { 
+        m_ip += 2; 
+        return static_cast<std::uint16_t>((m_ip[-2] << 8) | m_ip[-1]);
+    };
     while (true) {
 #ifdef DEBUG_TRACE_EXECUTION
         const auto distance = std::distance(m_chunk->code.cbegin(), m_ip);
@@ -116,6 +120,19 @@ InterpretResult VM::run() {
                 const auto value = std::get<Number>(last);
                 m_stack.pop_back();
                 m_stack.emplace_back(-value);
+                break;
+            };
+            case OpCode::Jump: {
+                std::uint16_t offset = readShort();
+                m_ip += offset;
+                break;
+            };
+            case OpCode::JumpIfFalse: {
+                std::uint16_t offset = readShort();
+
+                if (isFalsey(peek(0))) {
+                    m_ip += offset;
+                }
                 break;
             };
             case OpCode::Print: {

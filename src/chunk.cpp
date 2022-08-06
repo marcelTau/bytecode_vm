@@ -49,6 +49,8 @@ std::size_t Chunk::disassembleInstruction(std::size_t offset) const {
         case OpCode::Divide: return simpleInstruction("Divide", offset);
         case OpCode::Not: return simpleInstruction("Not", offset);
         case OpCode::Negate: return simpleInstruction("Negate", offset);
+        case OpCode::Jump: return jumpInstruction("Jump", 1, offset);
+        case OpCode::JumpIfFalse: return jumpInstruction("JumpIfFalse", 1, offset);
         case OpCode::Print: return simpleInstruction("Print", offset);
         case OpCode::Return: return simpleInstruction("Return", offset);
         default:
@@ -80,3 +82,31 @@ std::size_t Chunk::byteInstruction(const std::string_view name, std::size_t offs
     fmt::print("{:16} {:4d}\n", name, slot);
     return offset + 2;
 }
+
+std::size_t Chunk::jumpInstruction(const std::string_view name, std::size_t sign, std::size_t offset) const {
+    auto jump = static_cast<std::uint16_t>(code[offset + 1] << 8);
+    jump |= code[offset + 2];
+    fmt::print("{:16} {:4d} -> {}\n", name, offset, offset + 3 + sign * jump);
+    return offset + 3;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

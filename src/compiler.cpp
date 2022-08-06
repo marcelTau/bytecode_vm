@@ -41,6 +41,8 @@ void Compiler::declaration() {
 void Compiler::statement() {
     if (match(TokenType::Print)) {
         printStatement();
+    } else if (match(TokenType::If)) {
+        ifStatement();
     } else if (match(TokenType::LeftBrace)) {
         beginScope();
         block();
@@ -56,6 +58,25 @@ void Compiler::block() {
     }
 
     consume(TokenType::RightBrace, "Expect '}' after block.");
+}
+
+void Compiler::ifStatement() {
+    consume(TokenType::LeftParen, "Expect '('  after 'if'.");
+    expression();
+    consume(TokenType::RightParen, "Expect ')'  after condition.");
+
+    int thenJump = emitJump(OpCode::JumpIfFalse);
+    emitByte(OpCode::Pop);
+    statement();
+    patchJump(thenJump);
+    emitByte(OpCode::Pop);
+
+    if (match(TokenType::Else)) {
+        statement();
+    }
+
+    int elseJump = emitJump(OpCode::Jump);
+    patchJump(elseJump);
 }
 
 void Compiler::printStatement() {
@@ -386,3 +407,34 @@ void Compiler::endScope() {
         variables.localCount--;
     }
 }
+
+void Compiler::patchJump(int offset) {
+    std::size_t offset_size = static_cast<std::size_t>(offset);
+    std::size_t jump = chunk.code.size() - offset_size - 2;
+
+    if (jump > UINT16_MAX) {
+        error("Too much code to jump over.");
+    }
+
+    chunk.code[offset_size] = (jump >> 8) & 0xff;
+    chunk.code[offset_size + 1] = jump & 0xff;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
