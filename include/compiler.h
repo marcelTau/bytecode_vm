@@ -98,6 +98,7 @@ private:
     void statement();
     void block();
 
+    void whileStatement();
     void ifStatement();
     void printStatement();
     void expressionStatement();
@@ -155,6 +156,7 @@ private:
 
     void emitConstant(const Value& value);
     void emitReturn();
+    void emitLoop(std::size_t loopStart);
 
     std::uint8_t makeConstant(const Value& value);
 

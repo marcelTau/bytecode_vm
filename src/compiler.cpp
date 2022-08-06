@@ -43,6 +43,8 @@ void Compiler::statement() {
         printStatement();
     } else if (match(TokenType::If)) {
         ifStatement();
+    } else if (match(TokenType::While)) {
+        whileStatement();
     } else if (match(TokenType::LeftBrace)) {
         beginScope();
         block();
@@ -58,6 +60,22 @@ void Compiler::block() {
     }
 
     consume(TokenType::RightBrace, "Expect '}' after block.");
+}
+
+void Compiler::whileStatement() {
+    auto loopStart = chunk.code.size();
+    consume(TokenType::LeftParen, "Expect '(' after 'while'.");
+    expression();
+    consume(TokenType::RightParen, "Expect ')' after condition.");
+
+    auto exitJump = emitJump(OpCode::JumpIfFalse);
+
+    emitByte(OpCode::Pop);
+    statement();
+    emitLoop(loopStart);
+
+    patchJump(exitJump);
+    emitByte(OpCode::Pop);
 }
 
 void Compiler::ifStatement() {
@@ -379,6 +397,19 @@ void Compiler::emitReturn() {
 
 void Compiler::emitConstant(const Value& value) {
     emitBytes(OpCode::Constant, makeConstant(value));
+}
+
+void Compiler::emitLoop(std::size_t loopStart) {
+    emitByte(OpCode::Loop);
+
+    std::size_t offset = chunk.code.size() - loopStart + 2;
+
+    if (offset > UINT16_MAX) {
+        error("Loop body too large");
+    }
+
+    emitByte(static_cast<std::uint8_t>((offset >> 8) & 0xff));
+    emitByte(static_cast<std::uint8_t>(offset & 0xff));
 }
 
 std::uint8_t Compiler::makeConstant(const Value& value) {

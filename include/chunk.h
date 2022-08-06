@@ -80,7 +80,7 @@ struct Chunk {
     [[nodiscard]] std::size_t disassembleInstruction(std::size_t offset) const;
     [[nodiscard]] std::size_t simpleInstruction(const std::string_view name, std::size_t offset) const;
     [[nodiscard]] std::size_t byteInstruction(const std::string_view name, std::size_t offset) const;
-    [[nodiscard]] std::size_t jumpInstruction(const std::string_view name, std::size_t sign, std::size_t offset) const;
+    [[nodiscard]] std::size_t jumpInstruction(const std::string_view name, int sign, std::size_t offset) const;
 
     [[nodiscard]] std::size_t addConstant(const Value& value);
     [[nodiscard]] std::size_t constantInstruction(const std::string_view name, std::size_t offset) const;

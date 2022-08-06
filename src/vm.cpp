@@ -139,6 +139,11 @@ InterpretResult VM::run() {
                 fmt::print("{}\n", std::visit(PrintVisitor{}, pop()));
                 break;
             };
+            case OpCode::Loop: {
+                std::uint16_t offset = readShort();
+                m_ip -= offset;
+                break;
+            }
             case OpCode::Return: {
                 return InterpretResult::Ok;
             }
